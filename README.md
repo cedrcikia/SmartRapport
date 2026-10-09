@@ -1,4 +1,4 @@
-# ⏱️ SmartRappor – Arbeitszeit-App für Temporäre (Konsole)
+# ⏱️ SmartRapport – Arbeitszeit-App für Temporäre (Konsole)
 
 Gruppenprojekt im Modul **Grundlagen Programmieren**, FHNW, Herbstsemester 2026.
 
@@ -45,21 +45,21 @@ Jede Person im Team ist für 3 User Stories zuständig.
 
 | Person | Stories |
 |---|---|
-| A (Einstellungen) | US-01, US-02, US-03 |
-| B (Stunden erfassen) | US-04, US-05, US-06 |
-| C (Verwalten und Termin) | US-07, US-08, US-09 |
-| D (Berechnung und Rapport) | US-10, US-11, US-12 |
+| A | US-01, US-02, US-03 |
+| B | US-04, US-05, US-09 |
+| C | US-06, US-07, US-08 |
+| D | US-10, US-11, US-12 |
 
 Beispielwerte: Stundenlohn CHF 32.50, Sollzeit 8 Std 00 Min pro Tag, Zuschlag 25 %, AHV 5.30 %, ALV 1.10 %, NBU 0.80 %.
 
-### Person A – Einstellungen
+### Einstellungen (Person A)
 
 #### US-01: Stundenlohn eingeben
 Als **Temporärer** möchte ich meinen Stundenlohn eingeben und ändern können, damit mein Lohn immer richtig berechnet wird.
 
 **Akzeptanzkriterien**
 * Der Lohn wird in `einstellungen.txt` gespeichert und beim Start der App geladen.
-* Gegeben der Temporäre gibt `32.50` ein, wenn er bestätigt, dann erscheint ` Stundenlohn gespeichert: CHF 32.50` und `einstellungen.txt` enthält `stundenlohn=32.50`.
+* Gegeben der Temporäre gibt `32.50` ein, wenn er bestätigt, dann erscheint `Stundenlohn gespeichert: CHF 32.50` und `einstellungen.txt` enthält `stundenlohn=32.50`.
 * Gegeben `einstellungen.txt` enthält `stundenlohn=32.50`, wenn die App neu gestartet wird, dann wird CHF 32.50 verwendet.
 * Gegeben die Eingabe `abc`, eine leere Eingabe, `0` oder `-5`, wenn er bestätigt, dann erscheint `Ungültiger Stundenlohn.`, nichts wird gespeichert und die App fragt erneut.
 
@@ -69,10 +69,8 @@ Als **Temporärer** möchte ich meine tägliche Sollzeit laut Vertrag eingeben, 
 **Akzeptanzkriterien**
 * Stunden und Minuten werden einzeln abgefragt. Stunden sind eine ganze Zahl von 1 bis 24, Minuten eine ganze Zahl von 0 bis 59.
 * Die Sollzeit wird in Minuten in `einstellungen.txt` gespeichert (`soll_min`).
-* Gegeben `8` Std und `0` Min, wenn er bestätigt, dann erscheint ` Sollzeit gespeichert: 8 Std 00 Min pro Tag` und `einstellungen.txt` enthält `soll_min=480`.
+* Gegeben `8` Std und `0` Min, wenn er bestätigt, dann erscheint `Sollzeit gespeichert: 8 Std 00 Min pro Tag` und `einstellungen.txt` enthält `soll_min=480`.
 * Gegeben Minuten `60`, Stunden `0`, Stunden `abc` oder eine leere Eingabe, dann erscheint `Ungültige Eingabe.` und die App fragt erneut.
-
-Hier ist die User Story **US-03** im Stil einer **Mock-up-Language** (Dialog-Skript für den Konsolen-Ablauf, wie er in der App stattfinden soll):
 
 ---
 
@@ -82,26 +80,25 @@ Als **Temporärer** möchte ich den Überstunden-Zuschlag und die Abzüge (AHV, 
 
 ##### Mock-up-Ablauf (Konsolen-Dialog)
 
+```
 [EINSTELLUNGEN - BETRIEBLICHE SÄTZE]
-
-Stundenlohn [CHF 32.50]: 
-Tägliche Sollzeit [8 Std 00 Min]: 
 
 Überstunden-Zuschlag in % [25]: 25
 AHV-Abzug in % [5.3]: 5.3
 ALV-Abzug in % [1.1]: 1.1
 NBU-Abzug in % [0.8]: 0.8
+```
 
 ##### Akzeptanzkriterien
 
 * Zuschlag, AHV, ALV und NBU werden einzeln als Prozentwert abgefragt und in `einstellungen.txt` gespeichert.
 * Jeder Wert ist eine Zahl von 0 bis 100 und darf Nachkommastellen haben.
 * Alle Werte können später geändert werden.
-* Gegeben Zuschlag `25`, AHV `5.3`, ALV `1.1` und NBU `0.8`, wenn alle bestätigt werden, dann erscheint ` Sätze gespeichert` und `einstellungen.txt` enthält `zuschlag=25`, `ahv=5.3`, `alv=1.1` und `nbu=0.8`.
+* Gegeben Zuschlag `25`, AHV `5.3`, ALV `1.1` und NBU `0.8`, wenn alle bestätigt werden, dann erscheint `Sätze gespeichert` und `einstellungen.txt` enthält `zuschlag=25`, `ahv=5.3`, `alv=1.1` und `nbu=0.8`.
 * Gegeben der Wert `0`, dann wird er akzeptiert.
 * Gegeben der Wert `101`, `-1`, `abc` oder leer, dann erscheint `Ungültiger Prozentwert (0 bis 100).` und derselbe Wert wird erneut abgefragt.
 
-### Person B – Stunden eintragen
+### Stunden eintragen (US-04, US-05: Person B, US-06: Person C)
 
 #### US-04: Arbeitstag eintragen
 Als **Temporärer** möchte ich einen Arbeitstag mit Datum, Startzeit und Endzeit eintragen, damit meine Stunden festgehalten sind.
@@ -129,12 +126,12 @@ Als **Temporärer** möchte ich, dass meine Einträge automatisch gespeichert un
 
 **Akzeptanzkriterien**
 * Jeder Eintrag wird nach der Pause in `stunden.txt` gespeichert, eine Zeile pro Eintrag (siehe Festlegung 7). Beim Start werden alle gültigen Zeilen geladen.
-* Gegeben Datum `05.10.2026`, Start `07:30`, Ende `17:00` und Pause `45`, dann steht `05.10.2026;07:30;17:00;45` in `stunden.txt` und es erscheint ` Eintrag gespeichert`.
+* Gegeben Datum `05.10.2026`, Start `07:30`, Ende `17:00` und Pause `45`, dann steht `05.10.2026;07:30;17:00;45` in `stunden.txt` und es erscheint `Eintrag gespeichert`.
 * Gegeben `stunden.txt` enthält 3 gültige Zeilen, wenn die App startet, dann sind 3 Einträge geladen.
 * Gegeben Zeile 2 lautet `05.10.2026;07:30;abc;45`, wenn die App startet, dann erscheint `Zeile 2 übersprungen: 05.10.2026;07:30;abc;45`, die anderen Zeilen werden geladen und die App stürzt nicht ab.
 * Gegeben `stunden.txt` existiert nicht, wenn die App startet, dann startet sie mit einer leeren Liste ohne Fehlermeldung.
 
-### Person C – Einträge verwalten und Abgabetermin
+### Einträge verwalten und Abgabetermin (US-07, US-08: Person C, US-09: Person B)
 
 #### US-07: Einträge anzeigen
 Als **Temporärer** möchte ich alle Einträge eines Monats sehen, damit ich weiss, was ich gearbeitet habe.
@@ -169,7 +166,7 @@ Als **Temporärer** möchte ich beim Starten der App an den Abgabetermin erinner
 * Gegeben das heutige Datum ist `21.10.2026` oder `26.10.2026`, dann erscheint keine Erinnerung.
 * Gegeben das heutige Datum ist `22.10.2026` und `rapport_10_2026.txt` existiert, dann erscheint keine Erinnerung.
 
-### Person D – Berechnung und Rapport
+### Berechnung und Rapport (Person D)
 
 #### US-10: Überstunden ausrechnen
 Als **Temporärer** möchte ich, dass die App meine Überstunden selbst ausrechnet, damit ich das nicht von Hand machen muss.
@@ -212,6 +209,195 @@ Als **Lohnbuchhaltung** möchte ich vom Temporären einen Rapport als Textdatei 
 **Akzeptanzkriterien**
 * Der Temporäre wählt den Monat, die App speichert den Rapport als `rapport_<MM>_<JJJJ>.txt`, z.B. `rapport_10_2026.txt`.
 * Die Datei enthält den Monat, den Abgabetermin (`Abgabetermin: 25.10.2026`), alle Einträge (wie in US-07) und die Lohnübersicht (wie in US-11). Die Beträge sind identisch mit denen der Übersicht.
-* Gegeben der Monat `10.2026` mit Einträgen, wenn der Rapport gespeichert wird, dann erscheint ` Rapport gespeichert als rapport_10_2026.txt` und die Datei existiert.
+* Gegeben der Monat `10.2026` mit Einträgen, wenn der Rapport gespeichert wird, dann erscheint `Rapport gespeichert als rapport_10_2026.txt` und die Datei existiert.
 * Gegeben `rapport_10_2026.txt` existiert schon, dann fragt die App `Datei existiert bereits. Überschreiben? (j/n)`. Bei `j` wird sie überschrieben, bei `n` bleibt sie unverändert.
 * Gegeben der Monat hat keine Einträge, dann erscheint `Keine Einträge – Rapport nicht erstellt.` und es wird keine Datei angelegt.
+
+---
+
+## 👥 Aufgabenverteilung
+
+### Überblick
+
+| Person | Schwierigkeit | Stories | Eigene Dateien |
+|---|---|---|---|
+| **A** | sehr einfach | US-01 Stundenlohn, US-02 Sollzeit, US-03 Zuschlag und Abzüge | `einstellungen.py`, `hilfen.py` |
+| **B** | mittelleicht | US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung | `erfassen.py`, `erinnerung.py`, `main.py` |
+| **C** | mittelschwer | US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `speicher.py`, `verwaltung.py` |
+| **D** | schwer (die 3 schwierigsten) | US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `berechnung.py`, `rapport.py` |
+
+**Warum so:**
+* A schreibt dreimal dasselbe Muster (fragen, prüfen, speichern). Dazu kommt `hilfen.py`, eine Sammlung kleiner Funktionen, die alle brauchen. Das ist kurz, aber wichtig.
+* B prüft Eingaben (Datum, Uhrzeit, Pause) und baut das Hauptmenü.
+* C arbeitet mit Listen und Dictionaries: Dateien lesen und schreiben, sortieren, nummerieren, ändern, löschen.
+* D rechnet: Überstunden pro Tag, Lohn, Abzüge, Rundung, und schreibt die Rapport-Datei.
+
+---
+
+### Regeln, damit ihr parallel arbeiten könnt
+
+1. **Jede Person bearbeitet nur ihre eigenen Dateien.** Nur so gibt es keine Konflikte in Git. `main.py` gehört B. Wenn ihr etwas im Menü braucht, sagt es B.
+2. **Die Funktionsnamen unten sind fix.** Sie sind der Vertrag zwischen euch. Namen, Parameter und Rückgabewerte ändert nur ihr gemeinsam im Team.
+3. **Niemand wartet auf andere.** Jede Person testet zuerst mit Testdaten und kleinen Dummy-Funktionen (siehe unten). Erst wenn die anderen Teile fertig sind, setzt ihr alles zusammen.
+4. **Regelmässig committen, mit eigenem Namen.** Die Dozierenden prüfen die Beiträge über die Commits.
+5. **Kurz erklären können, was die Funktion tut.** Schreibt bei jeder Funktion einen Kommentar in eigenen Worten.
+
+---
+
+### Gemeinsame Datenformen
+
+**Ein Eintrag** (Dictionary), z.B.:
+
+```
+{"datum": "05.10.2026", "start": "07:30", "ende": "17:00", "pause_min": 45}
+```
+
+`pause_min` ist eine Zahl, alles andere Text.
+
+**Einstellungen** (Dictionary), z.B.:
+
+```
+{"stundenlohn": 32.5, "soll_min": 480, "zuschlag": 25.0, "ahv": 5.3, "alv": 1.1, "nbu": 0.8}
+```
+
+**Monat** ist immer ein Text im Format `"10.2026"`.
+
+**Ergebnis der Berechnung** (Dictionary, das D liefert):
+
+```
+{"normal_min": 930, "ueber_min": 45, "brutto": 534.22,
+ "abzuege": {"AHV": 28.31, "ALV": 5.88, "NBU": 4.27}, "netto": 495.76}
+```
+
+---
+
+### Schnittstellen (die Funktionen, die ihr einander anbietet)
+
+#### `hilfen.py` (Person A)
+
+| Funktion | Gibt zurück | Zweck |
+|---|---|---|
+| `zeit_zu_minuten(text)` | Zahl | `"07:30"` wird zu `450` |
+| `minuten_zu_text(minuten)` | Text | `525` wird zu `"8 Std 45 Min"` |
+| `ist_gueltiges_datum(text)` | `True`/`False` | prüft `TT.MM.JJJJ` und ob das Datum existiert |
+| `ist_gueltige_uhrzeit(text)` | `True`/`False` | prüft `HH:MM` |
+| `ist_gueltiger_monat(text)` | `True`/`False` | prüft `MM.JJJJ` |
+| `frage_monat()` | Text | fragt den Monat ab, bis er gültig ist |
+| `frage_ja_nein(frage)` | `True`/`False` | fragt `j/n` ab, bis die Eingabe stimmt |
+| `arbeitszeit_minuten(eintrag)` | Zahl | Ende minus Start minus Pause |
+| `rapport_dateiname(monat)` | Text | `"10.2026"` wird zu `"rapport_10_2026.txt"` |
+
+#### `einstellungen.py` (Person A)
+
+| Funktion | Zweck |
+|---|---|
+| `lade_einstellungen()` | liest `einstellungen.txt`, legt sie mit Standardwerten an, falls sie fehlt. Gibt das Einstellungs-Dictionary zurück |
+| `speichere_einstellungen(einstellungen)` | schreibt `einstellungen.txt` |
+| `stundenlohn_eingeben(einstellungen)` | US-01 |
+| `sollzeit_eingeben(einstellungen)` | US-02 |
+| `saetze_eingeben(einstellungen)` | US-03 |
+
+#### `erfassen.py` (Person B)
+
+| Funktion | Zweck |
+|---|---|
+| `frage_datum()` | fragt ein Datum ab, bis es gültig ist. Gibt Text zurück |
+| `frage_uhrzeit(text)` | fragt eine Uhrzeit mit dem Fragetext ab. Gibt Text zurück |
+| `frage_pause(max_min)` | fragt die Pause ab, sie muss kürzer als `max_min` sein. Gibt eine Zahl zurück |
+| `arbeitstag_eintragen(eintraege)` | US-04 und US-05: fragt alles ab, hängt den Eintrag an die Liste an und speichert (ruft `speichere_eintraege` auf) |
+
+#### `erinnerung.py` (Person B)
+
+| Funktion | Zweck |
+|---|---|
+| `pruefe_erinnerung(heute)` | US-09: zeigt den Hinweis oder nichts. `heute` ist ein `date`-Objekt. So lässt sich jeder Tag testen |
+
+#### `speicher.py` (Person C)
+
+| Funktion | Zweck |
+|---|---|
+| `lade_eintraege()` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen mit Meldung. Gibt die Liste der Einträge zurück |
+| `speichere_eintraege(eintraege)` | schreibt die ganze Liste in `stunden.txt` |
+
+#### `verwaltung.py` (Person C)
+
+| Funktion | Zweck |
+|---|---|
+| `eintraege_des_monats(eintraege, monat)` | Einträge dieses Monats, nach Datum sortiert. D braucht diese Funktion auch |
+| `zeige_eintraege(eintraege)` | US-07: fragt den Monat ab und zeigt die nummerierte Liste mit Total |
+| `aendern_loeschen(eintraege)` | US-08: Liste zeigen, Nummer wählen, ändern oder löschen, speichern |
+
+#### `berechnung.py` (Person D)
+
+| Funktion | Zweck |
+|---|---|
+| `berechne_monat(monats_eintraege, einstellungen)` | US-10 und Lohn: gibt das Ergebnis-Dictionary zurück |
+| `zeige_uebersicht(eintraege, einstellungen)` | US-11: fragt den Monat ab und zeigt die Übersicht |
+
+#### `rapport.py` (Person D)
+
+| Funktion | Zweck |
+|---|---|
+| `rapport_speichern(eintraege, einstellungen)` | US-12: fragt den Monat ab, fragt bei bestehender Datei nach und schreibt `rapport_MM_JJJJ.txt` |
+
+#### `main.py` (Person B)
+
+Lädt Einstellungen und Einträge, ruft `pruefe_erinnerung` auf und zeigt das Hauptmenü. Jeder Menüpunkt ruft genau eine der obigen Funktionen auf.
+
+---
+
+### Wie jede Person ohne die anderen anfangen kann
+
+**Testdaten** (legt sie in eure Arbeitsordner, alle haben dieselben):
+
+`stunden.txt`
+```
+05.10.2026;07:30;17:00;45
+06.10.2026;08:00;16:00;30
+12.11.2026;08:00;17:00;60
+```
+
+`einstellungen.txt`
+```
+stundenlohn=32.50
+soll_min=480
+zuschlag=25
+ahv=5.3
+alv=1.1
+nbu=0.8
+```
+
+Mit diesen Daten ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15 Std 30 Min normal, 0 Std 45 Min Überstunden, Brutto CHF 534.22, Netto CHF 495.76. Das sind die Testfälle für D.
+
+**Was jede Person am Anfang tut:**
+
+| Person | Erster Schritt, ohne auf andere zu warten |
+|---|---|
+| A | `hilfen.py` zuerst, weil alle sie brauchen. Danach `einstellungen.py` |
+| B | Die Funktionen in `erfassen.py` und `erinnerung.py` einzeln ausprobieren. Für `speichere_eintraege` eine leere Dummy-Funktion, die nur `print` macht. `main.py` ruft zuerst nur die Dummy-Funktionen der anderen auf |
+| C | `lade_eintraege` und `speichere_eintraege` mit den Testdaten ausprobieren, dann `zeige_eintraege` und `aendern_loeschen` |
+| D | `berechne_monat` mit einer von Hand geschriebenen Liste aus zwei Dictionaries (wie in US-10) ausprobieren, mit den Einstellungen aus der Testdatei |
+
+Bis `hilfen.py` von A da ist, könnt ihr eure eigenen kleinen Versionen von `zeit_zu_minuten` usw. in eurer Datei haben. Danach löscht ihr sie und nehmt die von A.
+
+---
+
+### Reihenfolge (Vorschlag)
+
+| Wann | Ziel |
+|---|---|
+| bis So 11.10. | User Stories fertig und auf Moodle abgegeben (Frist: 12.10., 00:00) |
+| bis So 18.10. | Repository mit allen leeren Dateien und den Funktionsnamen, Testdaten im Repo, A liefert `hilfen.py` |
+| bis So 1.11. | Jede Person: ihre Stories laufen einzeln mit Testdaten |
+| bis So 15.11. | Zusammensetzen in `main.py`, gemeinsam alle Akzeptanzkriterien durchspielen |
+| bis So 29.11. | Fehler beheben, README fertig (Anforderungen, Implementation, Beiträge), Folien |
+| bis So 6.12., 23:55 | Abgabe: PDF der Folien mit Link zum **öffentlichen** Repo |
+
+Schaut das mit den Meilensteinen im Semesterprogramm von Felix nach. Wenn es dort frühere Termine gibt, gelten diese.
+
+---
+
+### Wenn jemand zu langsam oder zu schnell ist
+
+* **A fertig:** übernimmt Tests für alle (die Beispiele aus den Akzeptanzkriterien nachspielen), die README-Abschnitte Anforderungen und Libraries und hilft D.
+* **D hängt:** A oder B übernimmt US-11 (Übersicht). Das ist nur Anzeige, wenn `berechne_monat` schon das Ergebnis liefert. Meldet das früh im Team, vor allem, weil die Beiträge in Git sichtbar sein müssen.
