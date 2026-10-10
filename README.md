@@ -86,7 +86,7 @@ Als **Temporärer** möchte ich den Überstunden-Zuschlag und die Abzüge (AHV, 
 Überstunden-Zuschlag in % [25]: 25
 AHV-Abzug in % [5.3]: 5.3
 ALV-Abzug in % [1.1]: 1.1
-NBU-Abzug in % [0.8]: 0.8
+Suva-NBU-Abzug in % [3,74.]: 3.74
 ```
 
 ##### Akzeptanzkriterien
@@ -94,7 +94,7 @@ NBU-Abzug in % [0.8]: 0.8
 * Zuschlag, AHV, ALV und NBU werden einzeln als Prozentwert abgefragt und in `einstellungen.txt` gespeichert.
 * Jeder Wert ist eine Zahl von 0 bis 100 und darf Nachkommastellen haben.
 * Alle Werte können später geändert werden.
-* Gegeben Zuschlag `25`, AHV `5.3`, ALV `1.1` und NBU `0.8`, wenn alle bestätigt werden, dann erscheint `Sätze gespeichert` und `einstellungen.txt` enthält `zuschlag=25`, `ahv=5.3`, `alv=1.1` und `nbu=0.8`.
+* Gegeben Zuschlag `25`, AHV `5.3`, ALV `1.1` und NBU `3.74`, wenn alle bestätigt werden, dann erscheint `Sätze gespeichert` und `einstellungen.txt` enthält `zuschlag=25`, `ahv=5.3`, `alv=1.1` und `nbu=3.74`.
 * Gegeben der Wert `0`, dann wird er akzeptiert.
 * Gegeben der Wert `101`, `-1`, `abc` oder leer, dann erscheint `Ungültiger Prozentwert (0 bis 100).` und derselbe Wert wird erneut abgefragt.
 
@@ -106,8 +106,8 @@ Als **Temporärer** möchte ich einen Arbeitstag mit Datum, Startzeit und Endzei
 **Akzeptanzkriterien**
 * Datum im Format `TT.MM.JJJJ` (z.B. `05.10.2026`), Zeiten im Format `HH:MM` (z.B. `07:30`).
 * Gegeben Datum `05.10.2026`, Start `07:30` und Ende `17:00`, wenn er bestätigt, dann werden die Werte akzeptiert und die App fragt nach der Pause (US-05).
-* Gegeben das Datum `31.02.2026`, `5.10.26` oder `abc`, dann erscheint `Ungültiges Datum (TT.MM.JJJJ).` und das Datum wird erneut abgefragt.
-* Gegeben die Zeit `7:30`, `25:00` oder `abc`, dann erscheint `Ungültige Uhrzeit (HH:MM).` und die Zeit wird erneut abgefragt.
+* Gegeben das Datum `31.02.2026`; `5.10.26` oder `abc`, dann erscheint `Ungültiges Datum (TT.MM.JJJJ).` und das Datum wird erneut abgefragt.
+* Gegeben die Zeit `7:30`; `25:00` oder `abc`, dann erscheint `Ungültige Uhrzeit (HH:MM).` und die Zeit wird erneut abgefragt.
 * Gegeben Start `17:00` und Ende `07:30`, dann erscheint `Das Ende muss nach dem Start liegen.` und das Ende wird erneut abgefragt.
 
 #### US-05: Pause eingeben
@@ -148,7 +148,7 @@ Als **Temporärer** möchte ich alle Einträge eines Monats sehen, damit ich wei
 Als **Temporärer** möchte ich einen falschen Eintrag ändern oder löschen können, damit meine Stunden stimmen.
 
 **Akzeptanzkriterien**
-* Die App zeigt zuerst die Liste des gewählten Monats (wie in US-07). Der Eintrag wird über seine Nummer gewählt, danach Ändern oder Löschen.
+* Die App zeigt die Liste des gewählten Monats (wie in US-07). Der Eintrag wird über seine Nummer gewählt, danach Ändern oder Löschen.
 * Beim Ändern werden Datum, Start, Ende und Pause neu abgefragt und gleich geprüft wie in US-04 und US-05.
 * Nach jeder Änderung und jedem Löschen wird `stunden.txt` neu geschrieben.
 * Gegeben eine Liste mit 3 Einträgen, wenn Nummer `2` gewählt und das Ende auf `16:30` geändert wird, dann zeigt die Liste das neue Ende und `stunden.txt` enthält die Änderung.
@@ -196,8 +196,8 @@ Normalstunden:     15 Std 30 Min
 Brutto:            CHF 534.22
 AHV (5.30 %):      -CHF 28.31
 ALV (1.10 %):      -CHF 5.88
-NBU (0.80 %):      -CHF 4.27
-Netto:             CHF 495.76
+NBU (3.74 %):      -CHF 19.96
+Netto:             CHF 480.07
 ```
 
 * Gegeben alle Abzüge sind 0 %, dann ist der Nettolohn gleich dem Bruttolohn.
@@ -219,12 +219,12 @@ Als **Lohnbuchhaltung** möchte ich vom Temporären einen Rapport als Textdatei 
 
 ### Überblick
 
-| Person | Schwierigkeit | Stories | Eigene Dateien |
+| Person | Zuteilung | Stories | Eigene Dateien |
 |---|---|---|---|
-| **A** | sehr einfach | US-01 Stundenlohn, US-02 Sollzeit, US-03 Zuschlag und Abzüge | `einstellungen.py`, `hilfen.py` |
-| **B** | mittelleicht | US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung | `erfassen.py`, `erinnerung.py`, `main.py` |
-| **C** | mittelschwer | US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `speicher.py`, `verwaltung.py` |
-| **D** | schwer (die 3 schwierigsten) | US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `berechnung.py`, `rapport.py` |
+| **A** |Cédrc Kialunda| US-01 Stundenlohn, US-02 Sollzeit, US-03 Zuschlag und Abzüge | `einstellungen.py`, `hilfen.py` |
+| **B** |Leonard Qelaj| US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung | `erfassen.py`, `erinnerung.py`, `main.py` |
+| **C** |Bledi Isufi| US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `speicher.py`, `verwaltung.py` |
+| **D** |Rafaa El Sherkasi| US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `berechnung.py`, `rapport.py` |
 
 **Warum so:**
 * A schreibt dreimal dasselbe Muster (fragen, prüfen, speichern). Dazu kommt `hilfen.py`, eine Sammlung kleiner Funktionen, die alle brauchen. Das ist kurz, aber wichtig.
