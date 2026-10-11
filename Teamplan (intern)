@@ -2,15 +2,23 @@
 
 Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Stories. Fachliche Regeln und Stories stehen im `README.md`.
 
+| Person | Name | Stories | Dateien |
+|---|---|---|---|
+| **A** | Cédric Kialunda | US-01, US-02, US-03 | `hilfen.py`, `einstellungen.py` |
+| **B** | Leonard Qelaj | US-04, US-05, US-09, Hauptmenü | `erfassen.py`, `erinnerung.py`, `main.py` |
+| **C** | Bledi Isufi | US-06, US-07, US-08 | `speicher.py`, `verwaltung.py` |
+| **D** | Rafaa El Sherkasi | US-10, US-11, US-12 | `berechnung.py`, `rapport.py` |
+
 ---
 
-## Regeln, damit ihr parallel arbeiten könnt
+## Regeln, damit wir parallel arbeiten können
 
-1. **Jede Person bearbeitet nur ihre eigenen Dateien.** Nur so gibt es keine Konflikte in Git. `main.py` gehört B. Wenn ihr etwas im Menü braucht, sagt es B.
-2. **Die Funktionsnamen unten sind fix.** Sie sind der Vertrag zwischen euch. Namen, Parameter und Rückgabewerte ändert ihr nur gemeinsam im Team.
-3. **Niemand wartet auf andere.** Jede Person testet zuerst mit Testdaten und kleinen Dummy-Funktionen (siehe unten). Erst wenn die anderen Teile fertig sind, setzt ihr alles zusammen.
+1. **Jede Person bearbeitet nur ihre eigenen Dateien.** Nur so gibt es keine Konflikte in Git. `main.py` gehört B. Wer etwas im Menü braucht, sagt es B.
+2. **Die Funktionsnamen unten sind fix.** Sie sind unser Vertrag. Namen, Parameter und Rückgabewerte ändern wir nur gemeinsam im Team.
+3. **Niemand wartet auf andere.** Jede Person testet zuerst mit Testdaten und kleinen Dummy-Funktionen (siehe unten). Erst wenn alle Teile fertig sind, setzen wir alles zusammen.
 4. **Regelmässig committen, mit eigenem Namen.** Die Dozierenden prüfen die Beiträge über die Commits.
-5. **Kurz erklären können, was die Funktion tut.** Schreibt bei jeder Funktion einen Kommentar in eigenen Worten.
+5. **Jede Zeile erklären können.** Bei jeder Funktion steht ein Kommentar in eigenen Worten. In der Fragerunde muss jede Person ihren Code Zeile für Zeile erklären können (Projektrichtlinien, Kap. 4 und 6).
+6. **KI-Nutzung deklarieren.** KI darf helfen (Debuggen, Erklären, Sparring), muss aber angegeben werden. KI-generierte Projekte werden nicht akzeptiert.
 
 ---
 
@@ -22,7 +30,9 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 {"datum": "05.10.2026", "start": "07:30", "ende": "17:00", "pause_min": 45}
 ```
 
-`pause_min` ist eine Zahl, alles andere Text.
+`pause_min` ist eine Zahl (`int`), alles andere ist Text (`str`).
+
+**Alle Einträge** sind eine Liste (`list`) solcher Dictionaries. Pro Datum gibt es höchstens einen Eintrag.
 
 **Einstellungen** (Dictionary), z.B.:
 
@@ -41,7 +51,7 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 
 ---
 
-## Schnittstellen (die Funktionen, die ihr einander anbietet)
+## Schnittstellen (die Funktionen, die wir einander anbieten)
 
 ### `hilfen.py` (Person A)
 
@@ -55,7 +65,9 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 | `frage_monat()` | Text | fragt den Monat ab, bis er gültig ist |
 | `frage_ja_nein(frage)` | `True`/`False` | fragt `j/n` ab, bis die Eingabe stimmt |
 | `arbeitszeit_minuten(eintrag)` | Zahl | Ende minus Start minus Pause |
-| `rapport_dateiname(monat)` | Text | `"10.2026"` wird zu `"rapport_10_2026.txt"` |
+| `datum_existiert(eintraege, datum)` | `True`/`False` | prüft, ob es für dieses Datum schon einen Eintrag gibt. Brauchen B (US-04) und C (US-06, US-08) |
+| `rapport_dateiname(monat)` | Text | `"10.2026"` wird zu `"rapport_10_2026.txt"`. Brauchen B (US-09) und D (US-12) |
+| `abgabetermin(monat)` | Text | `"10.2026"` wird zu `"31.10.2026"` (letzter Tag des Monats). Brauchen B (US-09) und D (US-12) |
 
 ### `einstellungen.py` (Person A)
 
@@ -71,7 +83,7 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 
 | Funktion | Zweck |
 |---|---|
-| `frage_datum()` | fragt ein Datum ab, bis es gültig ist. Gibt Text zurück |
+| `frage_datum(eintraege)` | fragt ein Datum ab, bis es gültig ist und noch kein Eintrag dafür existiert (ruft `datum_existiert` auf). Gibt Text zurück |
 | `frage_uhrzeit(text)` | fragt eine Uhrzeit mit dem Fragetext ab. Gibt Text zurück |
 | `frage_pause(max_min)` | fragt die Pause ab, sie muss kürzer als `max_min` sein. Gibt eine Zahl zurück |
 | `arbeitstag_eintragen(eintraege)` | US-04 und US-05: fragt alles ab, hängt den Eintrag an die Liste an und speichert (ruft `speichere_eintraege` auf) |
@@ -80,13 +92,13 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 
 | Funktion | Zweck |
 |---|---|
-| `pruefe_erinnerung(heute)` | US-09: zeigt den Hinweis oder nichts. `heute` ist ein `date`-Objekt. So lässt sich jeder Tag testen |
+| `pruefe_erinnerung(heute)` | US-09: zeigt den Hinweis oder nichts. `heute` ist ein `date`-Objekt, so lässt sich jeder Tag testen. Nutzt `abgabetermin` und `rapport_dateiname` |
 
 ### `speicher.py` (Person C)
 
 | Funktion | Zweck |
 |---|---|
-| `lade_eintraege()` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen mit Meldung. Gibt die Liste der Einträge zurück |
+| `lade_eintraege()` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen und doppelte Daten mit Meldung. Gibt die Liste der Einträge zurück |
 | `speichere_eintraege(eintraege)` | schreibt die ganze Liste in `stunden.txt` |
 
 ### `verwaltung.py` (Person C)
@@ -95,7 +107,7 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 |---|---|
 | `eintraege_des_monats(eintraege, monat)` | Einträge dieses Monats, nach Datum sortiert. D braucht diese Funktion auch |
 | `zeige_eintraege(eintraege)` | US-07: fragt den Monat ab und zeigt die nummerierte Liste mit Total |
-| `aendern_loeschen(eintraege)` | US-08: Liste zeigen, Nummer wählen, `1` ändern oder `2` löschen, speichern |
+| `aendern_loeschen(eintraege)` | US-08: Liste zeigen, Nummer wählen, `1` ändern oder `2` löschen, speichern. Beim Ändern wird das Datum mit `datum_existiert` geprüft |
 
 ### `berechnung.py` (Person D)
 
@@ -108,17 +120,29 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 
 | Funktion | Zweck |
 |---|---|
-| `rapport_speichern(eintraege, einstellungen)` | US-12: fragt den Monat ab, fragt bei bestehender Datei nach und schreibt `rapport_MM_JJJJ.txt` |
+| `rapport_speichern(eintraege, einstellungen)` | US-12: fragt den Monat ab, fragt bei bestehender Datei nach und schreibt `rapport_MM_JJJJ.txt` (mit `abgabetermin`) |
 
 ### `main.py` (Person B)
 
-Lädt Einstellungen und Einträge, ruft `pruefe_erinnerung` auf und zeigt das Hauptmenü (Festlegung 8 im README). Jeder Menüpunkt ruft genau eine der obigen Funktionen auf. Punkt 9 beendet das Programm.
+Ablauf beim Start: `lade_einstellungen()` → `lade_eintraege()` → `pruefe_erinnerung(heute)` → Hauptmenü (Festlegung 8 im README).
+
+| Menüpunkt | Ruft auf | Von |
+|---|---|---|
+| 1 Arbeitstag eintragen | `arbeitstag_eintragen(eintraege)` | B |
+| 2 Einträge anzeigen | `zeige_eintraege(eintraege)` | C |
+| 3 Eintrag ändern oder löschen | `aendern_loeschen(eintraege)` | C |
+| 4 Übersicht anzeigen | `zeige_uebersicht(eintraege, einstellungen)` | D |
+| 5 Rapport speichern | `rapport_speichern(eintraege, einstellungen)` | D |
+| 6 Stundenlohn ändern | `stundenlohn_eingeben(einstellungen)` | A |
+| 7 Sollzeit ändern | `sollzeit_eingeben(einstellungen)` | A |
+| 8 Zuschlag und Abzüge ändern | `saetze_eingeben(einstellungen)` | A |
+| 9 Beenden | `Auf Wiedersehen!` und Programmende | B |
 
 ---
 
 ## Wie jede Person ohne die anderen anfangen kann
 
-**Testdaten** (legt sie in eure Arbeitsordner, alle haben dieselben):
+**Testdaten** (liegen im Repo, alle haben dieselben):
 
 `stunden.txt`
 ```
@@ -137,7 +161,16 @@ alv=1.1
 nbu=3.74
 ```
 
-Mit diesen Daten ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15 Std 30 Min normal, 0 Std 45 Min Überstunden, Brutto CHF 534.22, NBU CHF 19.98, Netto CHF 480.05. Das sind die Testfälle für D.
+Mit diesen Daten ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15 Std 30 Min normal, 0 Std 45 Min Überstunden, Brutto CHF 534.22, AHV CHF 28.31, ALV CHF 5.88, NBU CHF 19.98, Netto CHF 480.05. Das sind die Testfälle für D.
+
+`stunden_fehler.txt` (nur für C, zum Testen von US-06)
+```
+05.10.2026;07:30;17:00;45
+05.10.2026;07:30;abc;45
+05.10.2026;08:00;16:00;30
+```
+
+Erwartet: Zeile 1 wird geladen, Zeile 2 wird als kaputt übersprungen, Zeile 3 wird wegen doppeltem Datum übersprungen.
 
 **Was jede Person am Anfang tut:**
 
@@ -148,33 +181,37 @@ Mit diesen Daten ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15
 | C | `lade_eintraege` und `speichere_eintraege` mit den Testdaten ausprobieren, dann `zeige_eintraege` und `aendern_loeschen` |
 | D | `berechne_monat` mit einer von Hand geschriebenen Liste aus zwei Dictionaries (wie in US-10) ausprobieren, mit den Einstellungen aus der Testdatei |
 
-Bis `hilfen.py` von A da ist, könnt ihr eure eigenen kleinen Versionen von `zeit_zu_minuten` usw. in eurer Datei haben. Danach löscht ihr sie und nehmt die von A.
+Bis `hilfen.py` von A da ist, darf jede Person eigene kleine Versionen von `zeit_zu_minuten` usw. in ihrer Datei haben. Danach werden sie gelöscht und die von A verwendet.
 
 ---
 
-## Reihenfolge (Vorschlag)
+## Zeitplan (an das Semesterprogramm angepasst)
 
-| Wann | Unser Ziel | Meilenstein laut Semesterprogramm |
+| Bis wann | Unser Ziel | Meilenstein laut Semesterprogramm |
 |---|---|---|
-| bis So 11.10. | User Stories fertig und auf Moodle abgegeben (Frist: 12.10., 00:00) | KW 41: User Stories definiert und hochgeladen |
-| bis So 18.10. | Repository mit allen leeren Dateien und den Funktionsnamen, Testdaten im Repo, A liefert `hilfen.py` | KW 42 (12.10.): Haupt-Entscheidungs- und Kontrollfluss definiert |
-| bis So 1.11. | Jede Person: ihre Stories laufen einzeln mit Testdaten | KW 43 (19.10.): Programmfluss und Kernfunktionen umgesetzt · KW 44 (26.10.): Haupt- und Alternativabläufe umgesetzt, Kernfunktionen getestet |
-| bis So 15.11. | Zusammensetzen in `main.py`, gemeinsam alle Akzeptanzkriterien durchspielen | KW 47 (16.11.): Datei-Ein- und Ausgabe und Exception Handling umgesetzt |
-| bis So 29.11. | Fehler beheben, README fertig (Anforderungen, Implementation, Beiträge), Folien | KW 48 (23.11.): Datenvalidierung umgesetzt · KW 49 (30.11.): vollständige Anwendung |
-| bis So 6.12., 23:55 | Abgabe: PDF der Folien mit Link zum **öffentlichen** Repo | Abgabe 6.12., 23:55 |
+| So 11.10. | User Stories fertig und auf Moodle abgegeben (Frist: 12.10., 00:00) | KW 41: User Stories definiert und hochgeladen |
+| So 18.10. | Repository mit allen leeren Dateien und Funktionsnamen, Testdaten im Repo. Funktionsbaum und Ablaufskizze für `main.py`. A liefert `hilfen.py` | KW 42: Haupt-Entscheidungs- und Kontrollfluss definiert |
+| So 25.10. | Jede Person: Kernfunktionen laufen einzeln mit Testdaten, inkl. ungültiger Eingaben | KW 43: Programmfluss und Kernfunktionen umgesetzt · KW 44: Haupt- und Alternativabläufe umgesetzt, Kernfunktionen getestet |
+| So 15.11. | Zusammensetzen in `main.py`. Lesen und Schreiben der Dateien funktioniert, kein Absturz bei fehlenden oder kaputten Dateien | KW 47: Datei-Ein- und Ausgabe und Exception Handling umgesetzt |
+| So 22.11. | Alle Akzeptanzkriterien gemeinsam durchspielen, Validierung vollständig | KW 48: Datenvalidierung und Exception Handling umgesetzt |
+| So 29.11. | Fehler beheben, README fertig (Anforderungen, Implementation, Beiträge), Folien | KW 49: vollständige Anwendung |
+| So 6.12., 23:55 | Abgabe: PDF der Folien mit Link zum **öffentlichen** Repo | Abgabe 6.12., 23:55 |
 
-⚠️ Unser Plan liegt bei „Stories laufen einzeln“ (1.11.) hinter dem Semesterprogramm (26.10.). Wenn das Semesterprogramm frühere Termine hat, gelten diese.
-
----
-
-## Wenn jemand zu langsam oder zu schnell ist
-
-* **A fertig:** übernimmt Tests für alle (die Beispiele aus den Akzeptanzkriterien nachspielen), die README-Abschnitte Anforderungen und Libraries und hilft D.
-* **D hängt:** A oder B übernimmt US-11 (Übersicht). Das ist nur Anzeige, wenn `berechne_monat` schon das Ergebnis liefert. Meldet das früh im Team, vor allem, weil die Beiträge in Git sichtbar sein müssen.
+Die Präsentation (15 Minuten, alle sprechen) findet in den letzten beiden Semesterwochen statt.
 
 ---
 
-## Offene Punkte (noch im Team klären)
+## Wenn jemand früher fertig ist oder nicht weiterkommt
 
-1. **Mehrere Einträge am selben Datum:** Festlegung 3 sagt „pro Tag“, US-10 sagt „für jeden Eintrag“. Entscheiden: nur 1 Eintrag pro Datum (neues Kriterium in US-04) oder Tagessumme (US-10 anpassen).
-2. **Abgabetermin:** Der Oktober-Rapport bis 25.10. enthält die Tage 26.–31.10. nicht. Möglichkeiten: Rapport für den Vormonat bis 25., oder eine Abrechnungsperiode vom 26. bis 25. (dann müssen Festlegung 1, US-07, US-09 bis US-12 und `eintraege_des_monats` angepasst werden).
+* **A früher fertig:** übernimmt Tests für alle (die Beispiele aus den Akzeptanzkriterien nachspielen), die README-Abschnitte Anforderungen und Libraries und hilft D.
+* **D kommt nicht weiter:** A oder B übernimmt US-11 (Übersicht). Das ist nur Anzeige, wenn `berechne_monat` schon das Ergebnis liefert. Früh im Team melden, weil die Beiträge in Git sichtbar sein müssen.
+
+---
+
+## Entscheidungen im Team (11.10.2026)
+
+1. **Pro Datum höchstens ein Eintrag** (Festlegung 2, US-04, US-06, US-08).
+2. **Abgabetermin = letzter Tag des Monats** (Festlegung 6, US-09, US-12).
+3. **Nur der Punkt als Dezimaltrennzeichen** (Festlegung 5).
+4. **NBU-Satz 3.74 %** in allen Beispielen und als Standardwert (Festlegung 7).
+5. **Auszahlung am 5. des Folgemonats** steht nur im Szenario, wird nicht programmiert.
