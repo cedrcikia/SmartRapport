@@ -13,7 +13,7 @@ Viele Temporärmitarbeitende schreiben ihre Arbeitsstunden von Hand auf, auf ein
 
 ### Szenario
 
-Ein Temporärer arbeitet in einem Betrieb. Nach jedem Arbeitstag öffnet er SmartRapport in der Konsole und trägt Datum, Start, Ende und Pause ein. Stundenlohn, tägliche Sollzeit, Zuschlag und Abzüge gibt er einmal ein und kann sie später ändern. Am Ende des Monats lässt er sich Stunden und Lohn ausrechnen und speichert den Rapport als Textdatei. Die App erinnert ihn rechtzeitig an den Abgabetermin.
+Ein Temporärer arbeitet in einem Betrieb. Nach jedem Arbeitstag öffnet er SmartRapport in der Konsole und trägt Datum, Start, Ende und Pause ein. Stundenlohn, tägliche Sollzeit, Zuschlag und Abzüge gibt er einmal ein und kann sie später ändern. Am Ende des Monats lässt er sich Stunden und Lohn ausrechnen und speichert den Rapport als Textdatei. Die App erinnert ihn rechtzeitig an den Abgabetermin. Gibt er den Rapport bis Ende Monat ab, wird der Lohn am 5. des Folgemonats ausbezahlt.
 
 ### User Roles
 
