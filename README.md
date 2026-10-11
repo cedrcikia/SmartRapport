@@ -27,11 +27,11 @@ Die Konsole bedient immer der Temporäre. Die Lohnbuchhaltung hat Anforderungen 
 ### Festlegungen für alle Stories
 
 1. **Rapport:** Ein Rapport ist ein Kalendermonat. Ein Eintrag gehört zum Monat, der in seinem Datum steht (`05.10.2026` gehört zu `10.2026`).
-2. **Arbeitszeit:** Arbeitszeit = Endzeit minus Startzeit minus Pause. Das Ende muss am selben Tag nach dem Start liegen. Nachtschichten über Mitternacht gibt es in dieser Version nicht.
-3. **Überstunden:** Überstunden werden pro Tag gerechnet. Ist die Arbeitszeit eines Tages länger als die tägliche Sollzeit, ist der Rest Überstunden. Alle anderen Stunden sind Normalstunden. Auf Überstunden gibt es einen Zuschlag.
+2. **Arbeitszeit:** Arbeitszeit = Endzeit minus Startzeit minus Pause. Das Ende muss am selben Tag nach dem Start liegen. Nachtschichten über Mitternacht gibt es in dieser Version nicht. Pro Datum gibt es höchstens einen Eintrag.
+3. **Überstunden:** Überstunden werden pro Tag gerechnet (ein Tag = ein Eintrag, siehe Festlegung 2). Ist die Arbeitszeit eines Tages länger als die tägliche Sollzeit, ist der Rest Überstunden. Alle anderen Stunden sind Normalstunden. Auf Überstunden gibt es einen Zuschlag.
 4. **Lohn:** Bruttolohn = Normalstunden × Stundenlohn + Überstunden × Stundenlohn × (1 + Zuschlag in % / 100). Jeder Abzug ist ein Prozentsatz vom Bruttolohn. Nettolohn = Bruttolohn minus alle Abzüge. Der Nettolohn ist nur ein ungefährer Wert, weil weitere Abzüge wie BVG oder Quellensteuer nicht berücksichtigt werden.
 5. **Geld:** Alle Beträge sind in CHF mit zwei Nachkommastellen. Zuerst wird der Bruttolohn auf zwei Stellen gerundet, dann wird jeder Abzug einzeln von diesem Betrag berechnet und gerundet. Als Dezimaltrennzeichen gilt nur der Punkt (`32.50`), ein Komma (`32,50`) ist ungültig.
-6. **Abgabetermin:** Der Rapport muss bis zum 25. des Monats abgegeben werden.
+6. **Abgabetermin:** Der Rapport eines Monats muss bis zum letzten Tag dieses Monats abgegeben werden (z.B. Rapport Oktober 2026 bis 31.10.2026, Rapport Februar 2026 bis 28.02.2026).
 7. **Dateien:**
    * `stunden.txt`: eine Zeile pro Eintrag, `05.10.2026;07:30;17:00;45` (Datum, Start, Ende, Pause in Minuten).
    * `einstellungen.txt`: eine Zeile pro Wert als `schluessel=wert`: `stundenlohn`, `soll_min` (tägliche Sollzeit in Minuten), `zuschlag`, `ahv`, `alv`, `nbu`. Gibt es die Datei nicht, wird sie beim Start mit Standardwerten angelegt (Stundenlohn 30.00, Sollzeit 8 Std 00 Min, Zuschlag 25, AHV 5.3, ALV 1.1, NBU 3.74).
@@ -117,6 +117,7 @@ Als **Temporärer** möchte ich einen Arbeitstag mit Datum, Startzeit und Endzei
 * Gegeben das Datum `31.02.2026`, `5.10.26` oder `abc`, dann erscheint `Ungültiges Datum (TT.MM.JJJJ).` und das Datum wird erneut abgefragt.
 * Gegeben die Zeit `7:30`, `24:00`, `25:00` oder `abc`, dann erscheint `Ungültige Uhrzeit (HH:MM).` und die Zeit wird erneut abgefragt.
 * Gegeben Start `17:00` und Ende `07:30` oder Start `17:00` und Ende `17:00`, dann erscheint `Das Ende muss nach dem Start liegen.` und das Ende wird erneut abgefragt.
+* Gegeben es gibt schon einen Eintrag am `05.10.2026`, wenn das Datum `05.10.2026` eingegeben wird, dann erscheint `Für dieses Datum gibt es schon einen Eintrag.` und das Datum wird erneut abgefragt.
 
 #### US-05: Pause eingeben
 Als **Temporärer** möchte ich meine Pause in Minuten eingeben, damit nur meine echte Arbeitszeit zählt.
@@ -137,6 +138,7 @@ Als **Temporärer** möchte ich, dass meine Einträge automatisch gespeichert un
 * Gegeben Datum `05.10.2026`, Start `07:30`, Ende `17:00` und Pause `45`, dann steht `05.10.2026;07:30;17:00;45` in `stunden.txt` und es erscheint `Eintrag gespeichert`.
 * Gegeben `stunden.txt` enthält 3 gültige Zeilen, wenn die App startet, dann sind 3 Einträge geladen.
 * Gegeben Zeile 2 lautet `05.10.2026;07:30;abc;45`, wenn die App startet, dann erscheint `Zeile 2 übersprungen: 05.10.2026;07:30;abc;45`, die anderen Zeilen werden geladen und die App stürzt nicht ab.
+* Gegeben Zeile 1 und Zeile 3 haben beide das Datum `05.10.2026`, wenn die App startet, dann wird Zeile 1 geladen und es erscheint `Zeile 3 übersprungen: Datum doppelt`.
 * Gegeben `stunden.txt` existiert nicht, wenn die App startet, dann startet sie mit einer leeren Liste ohne Fehlermeldung.
 
 ### Einträge verwalten und Abgabetermin (US-07, US-08: Person C, US-09: Person B)
@@ -161,9 +163,11 @@ Als **Temporärer** möchte ich einen falschen Eintrag ändern oder löschen kö
 * Nach jeder Änderung und jedem Löschen wird `stunden.txt` neu geschrieben.
 * Gegeben eine Liste mit 3 Einträgen, wenn Nummer `2`, dann `1` (ändern) gewählt und das Ende auf `16:30` geändert wird, dann zeigt die Liste das neue Ende und `stunden.txt` enthält die Änderung.
 * Gegeben das Datum wird beim Ändern auf einen anderen Monat geändert (z.B. `03.11.2026`), dann erscheint der Eintrag danach in der Liste dieses Monats (siehe Festlegung 1).
+* Gegeben beim Ändern wird ein Datum eingegeben, für das es schon einen anderen Eintrag gibt, dann erscheint `Für dieses Datum gibt es schon einen Eintrag.` und das Datum wird erneut abgefragt. Das bisherige Datum des gewählten Eintrags ist erlaubt.
 * Gegeben Nummer `2` und danach `2` (löschen), wenn die App `Wirklich löschen? (j/n)` fragt und `j` eingegeben wird, dann ist der Eintrag weg und `stunden.txt` hat eine Zeile weniger.
 * Gegeben die Rückfrage wird mit `n` beantwortet, dann bleibt der Eintrag unverändert.
-* Gegeben die Nummer `0`, `4` (bei 3 Einträgen) oder `abc`, dann erscheint `Ungültige Nummer.` und die Nummer wird erneut abgefragt.
+* Gültig ist eine ganze Zahl von 1 bis zur Anzahl Einträge des Monats.
+* Gegeben eine Liste mit 3 Einträgen, wenn `0`, `4` oder `abc` eingegeben wird, dann erscheint `Ungültige Nummer.` und die Nummer wird erneut abgefragt.
 * Gegeben bei `1 = ändern, 2 = löschen:` wird `3`, `abc` oder nichts eingegeben, dann erscheint `Ungültige Wahl.` und die App fragt erneut.
 * Gegeben der gewählte Monat hat keine Einträge, dann erscheint `Keine Einträge für 10.2026.` und die App kehrt ins Hauptmenü zurück.
 
@@ -171,12 +175,13 @@ Als **Temporärer** möchte ich einen falschen Eintrag ändern oder löschen kö
 Als **Temporärer** möchte ich beim Starten der App an den Abgabetermin erinnert werden, damit ich den Rapport nicht vergesse.
 
 **Akzeptanzkriterien**
-* Der Abgabetermin ist der 25. jedes Monats. Die Erinnerung erscheint beim Start vom 22. bis und mit 25., und nur wenn die Datei `rapport_MM_JJJJ.txt` für diesen Monat noch nicht existiert.
-* Gegeben das heutige Datum ist `22.10.2026` und `rapport_10_2026.txt` existiert nicht, dann erscheint `Rapport Oktober bis 25.10.2026 abgeben – noch 3 Tage`.
-* Gegeben das heutige Datum ist `24.10.2026`, dann lautet der Hinweis `... – noch 1 Tag`.
-* Gegeben das heutige Datum ist `25.10.2026`, dann lautet der Hinweis `... – noch 0 Tage`.
-* Gegeben das heutige Datum ist `21.10.2026` oder `26.10.2026`, dann erscheint keine Erinnerung.
-* Gegeben das heutige Datum ist `22.10.2026` und `rapport_10_2026.txt` existiert, dann erscheint keine Erinnerung.
+* Der Abgabetermin ist der letzte Tag des Monats (siehe Festlegung 6). Die Erinnerung erscheint beim Start in den letzten 4 Tagen des Monats (3 Tage vorher bis und mit Abgabetag), und nur wenn die Datei `rapport_MM_JJJJ.txt` für diesen Monat noch nicht existiert.
+* Gegeben das heutige Datum ist `28.10.2026` und `rapport_10_2026.txt` existiert nicht, dann erscheint `Rapport Oktober bis 31.10.2026 abgeben – noch 3 Tage`.
+* Gegeben das heutige Datum ist `30.10.2026`, dann lautet der Hinweis `... – noch 1 Tag`.
+* Gegeben das heutige Datum ist `31.10.2026`, dann lautet der Hinweis `... – noch 0 Tage`.
+* Gegeben das heutige Datum ist `25.02.2026` und `rapport_02_2026.txt` existiert nicht, dann erscheint `Rapport Februar bis 28.02.2026 abgeben – noch 3 Tage`.
+* Gegeben das heutige Datum ist `27.10.2026` oder `01.11.2026`, dann erscheint keine Erinnerung für Oktober.
+* Gegeben das heutige Datum ist `28.10.2026` und `rapport_10_2026.txt` existiert, dann erscheint keine Erinnerung.
 
 ### Berechnung und Rapport (Person D)
 
@@ -184,7 +189,7 @@ Als **Temporärer** möchte ich beim Starten der App an den Abgabetermin erinner
 Als **Temporärer** möchte ich, dass die App meine Überstunden selbst ausrechnet, damit ich das nicht von Hand machen muss.
 
 **Akzeptanzkriterien**
-* Für jeden Eintrag des gewählten Monats werden Normalstunden und Überstunden berechnet (Regel siehe Festlegung 3). Danach wird über den Monat summiert.
+* Für jeden Tag (= jeden Eintrag) des gewählten Monats werden Normalstunden und Überstunden berechnet (Regel siehe Festlegung 3). Danach wird über den Monat summiert.
 
 | Sollzeit | Arbeitszeit des Tages | Normalstunden | Überstunden |
 |---|---|---|---|
@@ -220,11 +225,11 @@ Als **Lohnbuchhaltung** möchte ich vom Temporären einen Rapport als Textdatei 
 
 **Akzeptanzkriterien**
 * Der Temporäre wählt den Monat, die App speichert den Rapport als `rapport_<MM>_<JJJJ>.txt`, z.B. `rapport_10_2026.txt`.
-* Die Datei enthält den Monat, den Abgabetermin (`Abgabetermin: 25.10.2026`), alle Einträge (wie in US-07) und die Lohnübersicht (wie in US-11). Die Beträge sind identisch mit denen der Übersicht. Beispiel:
+* Die Datei enthält den Monat, den Abgabetermin (`Abgabetermin: 31.10.2026`), alle Einträge (wie in US-07) und die Lohnübersicht (wie in US-11). Die Beträge sind identisch mit denen der Übersicht. Beispiel:
 
 ```
 SMARTRAPPORT – RAPPORT 10.2026
-Abgabetermin: 25.10.2026
+Abgabetermin: 31.10.2026
 ----------------------------------------
 1. 05.10.2026  07:30–17:00  Pause 45 Min  8 Std 45 Min
 2. 06.10.2026  08:00–16:00  Pause 30 Min  7 Std 30 Min
@@ -253,3 +258,9 @@ Netto:             CHF 480.05
 | **B** | Leonard Qelaj | US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung, Hauptmenü (Festlegung 8) | `erfassen.py`, `erinnerung.py`, `main.py` |
 | **C** | Bledi Isufi | US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `speicher.py`, `verwaltung.py` |
 | **D** | Rafaa El Sherkasi | US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `berechnung.py`, `rapport.py` |
+
+**Warum so:**
+* A schreibt dreimal dasselbe Muster (fragen, prüfen, speichern). Dazu kommt `hilfen.py`, eine Sammlung kleiner Funktionen, die alle brauchen.
+* B prüft Eingaben (Datum, Uhrzeit, Pause) und baut das Hauptmenü.
+* C arbeitet mit Listen und Dictionaries: Dateien lesen und schreiben, sortieren, nummerieren, ändern, löschen.
+* D rechnet: Überstunden pro Tag, Lohn, Abzüge, Rundung, und schreibt die Rapport-Datei.
