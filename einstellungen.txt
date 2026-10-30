@@ -1,0 +1,6 @@
+   stundenlohn=32.50
+   soll_min=480
+   zuschlag=25
+   ahv=5.3
+   alv=1.1
+   nbu=3.74
