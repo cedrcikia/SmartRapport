@@ -1,4 +1,4 @@
-def eintraege_des_monats(eintraege, monat ): 
+def eintraege_des_monats(eintraege, monat): 
     gefunden = []
     for eintrag in eintraege:
         datum = eintrag["datum"]
