@@ -33,3 +33,16 @@ def eintraege_des_monats(eintraege, monat):
             if eintrag["datum"] == datum:
                 sortiert.append(eintrag)
     return sortiert 
+
+# DUMMY - Wird später druch frage_monat() aus hilfen.py ersetzt
+def frage_monat():
+    return input("Monat (MM.JJJJ): ")
+
+
+def zeige_eintraege(eintraege):
+    monat = frage_monat()
+    gefunden = eintraege_des_monats(eintraege, monat)
+    if len(gefunden) == 0:
+        print(f"Keine Einträge für {monat}.")
+    else:
+        print(gefunden)    
