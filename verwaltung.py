@@ -34,9 +34,33 @@ def eintraege_des_monats(eintraege, monat):
                 sortiert.append(eintrag)
     return sortiert 
 
-# DUMMY - Wird später druch frage_monat() aus hilfen.py ersetzt
+# DUMMY – wird später durch frage_monat() aus hilfen.py ersetzt
 def frage_monat():
     return input("Monat (MM.JJJJ): ")
+
+
+# DUMMY – wird später durch zeit_zu_minuten() aus hilfen.py ersetzt
+def zeit_zu_minuten(text):
+    # "07:30" -> 7 * 60 + 30 = 450
+    stunden = int(text[0:2])
+    minuten = int(text[3:5])
+    return stunden * 60 + minuten
+
+
+# DUMMY – wird später durch arbeitszeit_minuten() aus hilfen.py ersetzt
+def arbeitszeit_minuten(eintrag):
+    # Ende minus Start minus Pause (README, Festlegung 2)
+    start = zeit_zu_minuten(eintrag["start"])
+    ende = zeit_zu_minuten(eintrag["ende"])
+    return ende - start - eintrag["pause_min"]
+
+
+# DUMMY – wird später durch minuten_zu_text() aus hilfen.py ersetzt
+def minuten_zu_text(minuten):
+    # 525 -> "8 Std 45 Min"
+    stunden = minuten // 60
+    rest = minuten % 60
+    return f"{stunden} Std {rest:02d} Min"
 
 
 def zeige_eintraege(eintraege):
@@ -45,4 +69,25 @@ def zeige_eintraege(eintraege):
     if len(gefunden) == 0:
         print(f"Keine Einträge für {monat}.")
     else:
-        print(gefunden)    
+        nummer = 0 
+        total = 0
+        for eintrag in gefunden:
+            nummer += 1
+            datum = eintrag["datum"]
+            start = eintrag["start"]
+            ende = eintrag["ende"]
+            pause = eintrag["pause_min"]
+            minuten = arbeitszeit_minuten(eintrag)
+
+            print(f"{nummer}. {datum}  {start}–{ende}  Pause {pause} Min  {minuten_zu_text(minuten)}")
+            total += minuten    
+        print(f"Total: {minuten_zu_text(total)}")
+
+
+# Testdaten (vor dem Commit wieder löschen)
+eintraege = [
+    {"datum": "05.10.2026", "start": "07:30", "ende": "17:00", "pause_min": 45},
+    {"datum": "06.10.2026", "start": "08:00", "ende": "16:00", "pause_min": 30},
+    {"datum": "12.11.2026", "start": "08:00", "ende": "17:00", "pause_min": 60},
+]
+zeige_eintraege(eintraege)
