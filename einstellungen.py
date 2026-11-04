@@ -4,7 +4,14 @@
 from pathlib import Path
 
 DATEINAME = "einstellungen.txt"
-STANDARD = {"stundenlohn": 30.0, "soll_min": 480, "zuschlag": 25.0, "ahv": 5.3, "alv": 1.1, "nbu": 3.74}
+STANDARD = {
+    "stundenlohn": 30.0,
+    "soll_min": 480,
+    "zuschlag": 25.0,
+    "ahv": 5.3,
+    "alv": 1.1,
+    "nbu": 3.74,
+}
 
 
 def lade_einstellungen():
@@ -12,29 +19,29 @@ def lade_einstellungen():
     if not Path(DATEINAME).exists():
         speichere_einstellungen(STANDARD)
         return dict(STANDARD)
-    einstellungen = dict(STANDARD)              # Kopie, kein Alias
-    with open(DATEINAME, "r") as datei:
+    einstellungen = dict(STANDARD)             
+    with open(DATEINAME, "r", encoding="utf-8") as datei:
         for zeile in datei:
-            if "=" not in zeile:  # leere Zeile
+            if "=" not in zeile:  
                 continue
-            schlüssel, wert = zeile.strip().split("=", 1)
-            if not wert.replace(".", "", 1).isdecimal():  # z.B. abc
+            schluessel, wert = zeile.strip().split("=", 1)
+            if not wert.replace(".", "", 1).isdecimal():  
                 continue
-            if schlüssel == "soll_min":
-                einstellungen[schlüssel] = int(float(wert))
+            if schluessel == "soll_min":
+                einstellungen[schluessel] = int(float(wert))
             else:
-                einstellungen[schlüssel] = float(wert)
+                einstellungen[schluessel] = float(wert)
     return einstellungen
 
 
 def speichere_einstellungen(einstellungen):
-    """Schreibt jedes Paar als Zeile schlüssel=wert in einstellungen.txt."""
-    with open(DATEINAME, "w") as datei:
-        for schlüssel, wert in einstellungen.items():
-            if schlüssel == "stundenlohn":
-                datei.write(f"{schlüssel}={wert:.2f}\n")
+    """Schreibt jedes Paar als Zeile schluessel=wert in einstellungen.txt."""
+    with open(DATEINAME, "w", encoding="utf-8") as datei:
+        for schluessel, wert in einstellungen.items():
+            if schluessel == "stundenlohn":
+                datei.write(f"{schluessel}={wert:.2f}\n")
             else:
-                datei.write(f"{schlüssel}={wert}\n")
+                datei.write(f"{schluessel}={wert}\n")
 
 
 def stundenlohn_eingeben(einstellungen):
