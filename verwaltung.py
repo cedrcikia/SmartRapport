@@ -82,12 +82,3 @@ def zeige_eintraege(eintraege):
             print(f"{nummer}. {datum}  {start}–{ende}  Pause {pause} Min  {minuten_zu_text(minuten)}")
             total += minuten    
         print(f"Total: {minuten_zu_text(total)}")
-
-
-# Testdaten (vor dem Commit wieder löschen)
-eintraege = [
-    {"datum": "05.10.2026", "start": "07:30", "ende": "17:00", "pause_min": 45},
-    {"datum": "06.10.2026", "start": "08:00", "ende": "16:00", "pause_min": 30},
-    {"datum": "12.11.2026", "start": "08:00", "ende": "17:00", "pause_min": 60},
-]
-zeige_eintraege(eintraege)
