@@ -1,6 +1,7 @@
-# berechnung.py · Person D · Überstunden und Lohn eines Monats (US-10)
+# berechnung.py · Person D · Überstunden und Lohn eines Monats (US-10, US-11)
 
-from hilfen import arbeitszeit_minuten
+from hilfen import (arbeitszeit_minuten, eintraege_des_monats, frage_monat,
+                    minuten_zu_text)
 
 
 def berechne_ueberstunden(monats_eintraege, soll_min):
@@ -35,3 +36,23 @@ def berechne_monat(monats_eintraege, einstellungen):
     netto = round(brutto - sum(abzuege.values()), 2)
     return {"normal_min": normal_min, "ueber_min": ueber_min,
             "brutto": brutto, "abzuege": abzuege, "netto": netto}
+
+
+def zeige_uebersicht(eintraege, einstellungen):
+    """US-11: Fragt den Monat ab und zeigt Stunden, Lohn und Abzüge."""
+    monat = frage_monat()
+    monats_eintraege = eintraege_des_monats(eintraege, monat)
+    # Ohne Einträge gibt es nichts zu rechnen, also gleich beenden
+    if len(monats_eintraege) == 0:
+        print(f"Keine Einträge für {monat}.")
+        return
+    ergebnis = berechne_monat(monats_eintraege, einstellungen)
+    abzuege = ergebnis["abzuege"]
+    print(f"Normalstunden:  {minuten_zu_text(ergebnis['normal_min'])}")
+    print(f"Überstunden:    {minuten_zu_text(ergebnis['ueber_min'])}")
+    print(f"Brutto:         CHF {ergebnis['brutto']:.2f}")
+    # Der Prozentsatz im Text kommt aus den Einstellungen, nicht fest
+    print(f"AHV ({einstellungen['ahv']:.2f} %):   -CHF {abzuege['AHV']:.2f}")
+    print(f"ALV ({einstellungen['alv']:.2f} %):   -CHF {abzuege['ALV']:.2f}")
+    print(f"NBU ({einstellungen['nbu']:.2f} %):   -CHF {abzuege['NBU']:.2f}")
+    print(f"Netto:          CHF {ergebnis['netto']:.2f}")
