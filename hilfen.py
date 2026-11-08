@@ -61,3 +61,24 @@ def minuten_zu_text(minuten):
     stunden = minuten // 60
     rest = minuten % 60
     return f"{stunden} Std {rest:02d} Min"
+
+
+def frage_ja_nein(frage):
+    # Fragt so lange, bis "j" oder "n" eingegeben wird.
+    # Gibt True zurück bei "j", False bei "n".
+    antwort = input(frage + " ")
+    while antwort != "j" and antwort != "n":
+        print("Bitte j oder n eingeben.")
+        antwort = input(frage + " ")
+    if antwort == "j":
+        return True
+    else:
+        return False
+
+
+def datum_existiert(eintraege, datum):
+    # True, wenn es für dieses Datum schon einen Eintrag gibt
+    for eintrag in eintraege:
+        if eintrag["datum"] == datum:
+            return True
+    return False
