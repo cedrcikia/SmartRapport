@@ -1,5 +1,7 @@
 # erfassen.py · Person B · Arbeitstag und Pause erfassen (US-04, US-05)
 
+from hilfen import minuten_zu_text
+
 # Testwert aus README, kommt später von US-04
 dauer = 570
 
@@ -28,6 +30,4 @@ while True:
 
 # Arbeitszeit = Zeit zwischen Start und Ende minus Pause
 arbeit_min = dauer - int(pause)
-stunden = arbeit_min // 60
-minuten = arbeit_min % 60
-print(f"Arbeitszeit: {stunden} Std {minuten:02d} Min")
+print(f"Arbeitszeit: {minuten_zu_text(arbeit_min)}")
