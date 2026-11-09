@@ -54,3 +54,21 @@ def stundenlohn_eingeben(einstellungen):
     einstellungen["stundenlohn"] = betrag
     speichere_einstellungen(einstellungen)
     print(f"Stundenlohn gespeichert: CHF {betrag:.2f}")
+
+
+def sollzeit_eingeben(einstellungen):
+    """US-02: fragt, bis die Sollzeit pro Tag gültig ist, speichert in Minuten, bestätigt sie."""
+    text = input("Stunden: ")
+    while not text.isdecimal() or int(text) < 1 or int(text) > 24:
+        print("Ungültige Eingabe.")
+        text = input("Stunden: ")
+    stunden = int(text)
+
+    text = input("Minuten: ")
+    while not text.isdecimal() or int(text) > 59 or stunden == 24 and int(text) > 0:
+        print("Ungültige Eingabe.")
+        text = input("Minuten: ")
+    minuten = int(text)
+    einstellungen["soll_min"] = stunden * 60 + minuten
+    speichere_einstellungen(einstellungen)
+    print(f"Sollzeit gespeichert: {stunden} Std {minuten:02d} Min pro Tag")
