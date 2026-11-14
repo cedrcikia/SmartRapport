@@ -38,6 +38,26 @@ def berechne_monat(monats_eintraege, einstellungen):
             "brutto": brutto, "abzuege": abzuege, "netto": netto}
 
 
+def baue_uebersicht_zeilen(ergebnis, einstellungen):
+    """Baut die Zeilen der Lohnübersicht. US-11 und US-12 nutzen sie
+    beide, so sind die Beträge überall gleich.
+    """
+    abzuege = ergebnis["abzuege"]
+    normal = minuten_zu_text(ergebnis["normal_min"])
+    ueber = minuten_zu_text(ergebnis["ueber_min"])
+    zeilen = []
+    zeilen.append(f"{'Normalstunden:':<19}{normal:>13}")
+    zeilen.append(f"{'Überstunden:':<19}{ueber:>13}")
+    zeilen.append(f"{'Brutto:':<19}CHF {ergebnis['brutto']:.2f}")
+    # Der Prozentsatz im Text kommt aus den Einstellungen, nicht fest
+    for name in ("AHV", "ALV", "NBU"):
+        satz = einstellungen[name.lower()]
+        text = f"{name} ({satz:.2f} %):"
+        zeilen.append(f"{text:<19}-CHF {abzuege[name]:.2f}")
+    zeilen.append(f"{'Netto:':<19}CHF {ergebnis['netto']:.2f}")
+    return zeilen
+
+
 def zeige_uebersicht(eintraege, einstellungen):
     """US-11: Fragt den Monat ab und zeigt Stunden, Lohn und Abzüge."""
     monat = frage_monat()
@@ -47,12 +67,5 @@ def zeige_uebersicht(eintraege, einstellungen):
         print(f"Keine Einträge für {monat}.")
         return
     ergebnis = berechne_monat(monats_eintraege, einstellungen)
-    abzuege = ergebnis["abzuege"]
-    print(f"Normalstunden:  {minuten_zu_text(ergebnis['normal_min'])}")
-    print(f"Überstunden:    {minuten_zu_text(ergebnis['ueber_min'])}")
-    print(f"Brutto:         CHF {ergebnis['brutto']:.2f}")
-    # Der Prozentsatz im Text kommt aus den Einstellungen, nicht fest
-    print(f"AHV ({einstellungen['ahv']:.2f} %):   -CHF {abzuege['AHV']:.2f}")
-    print(f"ALV ({einstellungen['alv']:.2f} %):   -CHF {abzuege['ALV']:.2f}")
-    print(f"NBU ({einstellungen['nbu']:.2f} %):   -CHF {abzuege['NBU']:.2f}")
-    print(f"Netto:          CHF {ergebnis['netto']:.2f}")
+    for zeile in baue_uebersicht_zeilen(ergebnis, einstellungen):
+        print(zeile)
