@@ -89,12 +89,7 @@ def abgabetermin(monat):
     # Letzter Tag des Monats als Text: "10.2026" -> "31.10.2026"
     mm = int(monat[0:2])
     jahr = int(monat[3:7])
-    tage = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    letzter_tag = tage[mm - 1]
-    # Im Schaltjahr hat der Februar 29 Tage
-    if mm == 2:
-        if jahr % 400 == 0 or (jahr % 4 == 0 and jahr % 100 != 0):
-            letzter_tag = 29
+    letzter_tag = tage_im_monat(mm, jahr)
     return f"{letzter_tag:02d}.{monat}"
 
 

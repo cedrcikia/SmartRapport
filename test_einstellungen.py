@@ -46,6 +46,13 @@ assert lade_einstellungen()["stundenlohn"] == 34.0
 DATEI.unlink()
 assert lade_einstellungen()["stundenlohn"] == 30.0
 
+# Test 7: US-03, Prozentwerte stehen ohne unnötige .0 in der Datei
+speichere_einstellungen(test)
+inhalt = DATEI.read_text(encoding="utf-8")
+assert "zuschlag=25\n" in inhalt
+assert "ahv=5.3\n" in inhalt
+assert "alv=1.1\n" in inhalt
+assert "nbu=3.74\n" in inhalt
 # Echte Einstellungen zurückschreiben
 if gesichert is not None:
     DATEI.write_text(gesichert, encoding="utf-8")

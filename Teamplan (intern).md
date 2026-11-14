@@ -113,13 +113,17 @@ Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Storie
 
 | Funktion | Zweck |
 |---|---|
-| `berechne_monat(monats_eintraege, einstellungen)` | US-10 und Lohn: gibt das Ergebnis-Dictionary zurück |
+| `berechne_ueberstunden(monats_eintraege, soll_min)` | US-10: zählt pro Tag Normalstunden und Überstunden (in Minuten) und summiert sie über den Monat. Gibt `(normal_min, ueber_min)` zurück |
+| `berechne_monat(monats_eintraege, einstellungen)` | US-10 und Lohn: ruft `berechne_ueberstunden` auf und gibt das Ergebnis-Dictionary zurück |
+| `baue_uebersicht_zeilen(ergebnis, einstellungen)` | US-11 und US-12: baut die Zeilen der Lohnübersicht als Liste. So sind die Beträge in der Übersicht und im Rapport gleich |
 | `zeige_uebersicht(eintraege, einstellungen)` | US-11: fragt den Monat ab und zeigt die Übersicht |
 
 ### `rapport.py` (Person D)
 
 | Funktion | Zweck |
 |---|---|
+| `baue_eintragszeilen(monats_eintraege)` | US-12: eine Zeile pro Eintrag (ab 1 nummeriert, wie in US-07) und am Schluss das Total. Gibt eine Liste von Zeilen zurück |
+| `baue_rapport(monat, monats_eintraege, einstellungen)` | US-12: setzt alle Zeilen des Rapports zusammen (Kopf, Einträge, Lohnübersicht), ohne eine Datei zu schreiben |
 | `rapport_speichern(eintraege, einstellungen)` | US-12: fragt den Monat ab, fragt bei bestehender Datei nach und schreibt `rapport_MM_JJJJ.txt` (mit `abgabetermin`) |
 
 ### `main.py` (Person B)

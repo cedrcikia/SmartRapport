@@ -1,6 +1,8 @@
 # Automatische Tests für US-10 und die Lohnrechnung (US-11).
 # Die Werte stammen aus den Akzeptanzkriterien im README.
-from berechnung import berechne_ueberstunden, berechne_monat
+from berechnung import (baue_uebersicht_zeilen, berechne_monat,
+                        berechne_ueberstunden)
+from hilfen import minuten_zu_text
 
 # Sollzeit 8 Std 00 Min = 480 Min
 SOLL = 480
@@ -29,23 +31,39 @@ assert berechne_ueberstunden(zwei_tage, SOLL) == (930, 45)
 assert berechne_ueberstunden([], SOLL) == (0, 0)
 
 # Test 6: Lohnübersicht aus US-11 (Lohn 32.50, Zuschlag 25 %,
-# AHV 5.3 %, ALV 1.1 %, NBU 0.8 %)
+# AHV 5.3 %, ALV 1.1 %, NBU 3.74 %)
 einstellungen = {"soll_min": 480, "stundenlohn": 32.50, "zuschlag": 25,
-                 "ahv": 5.3, "alv": 1.1, "nbu": 0.8}
+                 "ahv": 5.3, "alv": 1.1, "nbu": 3.74}
 ergebnis = berechne_monat(zwei_tage, einstellungen)
 assert ergebnis["normal_min"] == 930
 assert ergebnis["ueber_min"] == 45
 assert ergebnis["brutto"] == 534.22
-assert ergebnis["abzuege"] == {"AHV": 28.31, "ALV": 5.88, "NBU": 4.27}
-assert ergebnis["netto"] == 495.76
+assert ergebnis["abzuege"] == {"AHV": 28.31, "ALV": 5.88, "NBU": 19.98}
+assert ergebnis["netto"] == 480.05
 
 # Test 7: alle Abzüge 0 %, dann ist Netto gleich Brutto
-einstellungen_ohne = dict(einstellungen, ahv=0, alv=0, nbu=0)
+einstellungen_ohne = {"soll_min": 480, "stundenlohn": 32.50, "zuschlag": 25,
+                      "ahv": 0, "alv": 0, "nbu": 0}
 ergebnis = berechne_monat(zwei_tage, einstellungen_ohne)
 assert ergebnis["netto"] == ergebnis["brutto"]
 
 # Test 8: Monat ohne Einträge gibt überall 0
 ergebnis = berechne_monat([], einstellungen)
 assert ergebnis["brutto"] == 0 and ergebnis["netto"] == 0
+assert minuten_zu_text(ergebnis["normal_min"]) == "0 Std 00 Min"
+assert minuten_zu_text(ergebnis["ueber_min"]) == "0 Std 00 Min"
+
+# Test 9: die Übersicht sieht genau so aus wie im README (US-11)
+ergebnis = berechne_monat(zwei_tage, einstellungen)
+erwartet = [
+    "Normalstunden:     15 Std 30 Min",
+    "Überstunden:        0 Std 45 Min",
+    "Brutto:            CHF 534.22",
+    "AHV (5.30 %):      -CHF 28.31",
+    "ALV (1.10 %):      -CHF 5.88",
+    "NBU (3.74 %):      -CHF 19.98",
+    "Netto:             CHF 480.05",
+]
+assert baue_uebersicht_zeilen(ergebnis, einstellungen) == erwartet
 
 print("Alle Tests bestanden")
