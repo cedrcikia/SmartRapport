@@ -38,10 +38,6 @@ def eintraege_des_monats(eintraege, monat):
     return sortiert
 
 
-def frage_monat():
-    return input("Monat (MM.JJJJ): ")
-
-
 def zeit_zu_minuten(text):
     # "07:30" -> 7 * 60 + 30 = 450
     stunden = int(text[0:2])
@@ -100,3 +96,64 @@ def abgabetermin(monat):
         if jahr % 400 == 0 or (jahr % 4 == 0 and jahr % 100 != 0):
             letzter_tag = 29
     return f"{letzter_tag:02d}.{monat}"
+
+
+def tage_im_monat(monat, jahr):
+    # Wie viele Tage hat der Monat? Februar: 29 im Schaltjahr, sonst 28
+    if monat == 2:
+        if jahr % 4 == 0 and (jahr % 100 != 0 or jahr % 400 == 0):
+            return 29
+        return 28
+    if monat == 4 or monat == 6 or monat == 9 or monat == 11:
+        return 30
+    return 31
+
+
+def ist_gueltiges_datum(text):
+    # Prüft TT.MM.JJJJ und ob es das Datum wirklich gibt
+    if len(text) != 10 or text[2] != "." or text[5] != ".":
+        return False
+    if not (text[0:2] + text[3:5] + text[6:10]).isdecimal():
+        return False
+    tag = int(text[0:2])
+    monat = int(text[3:5])
+    jahr = int(text[6:10])
+    if monat < 1 or monat > 12:
+        return False
+    if tag < 1 or tag > tage_im_monat(monat, jahr):
+        return False
+    return True
+
+
+def ist_gueltige_uhrzeit(text):
+    # Prüft HH:MM von 00:00 bis 23:59
+    if len(text) != 5 or text[2] != ":":
+        return False
+    if not (text[0:2] + text[3:5]).isdecimal():
+        return False
+    stunden = int(text[0:2])
+    minuten = int(text[3:5])
+    if stunden > 23 or minuten > 59:
+        return False
+    return True
+
+
+def ist_gueltiger_monat(text):
+    # Prüft MM.JJJJ, Monat 01 bis 12
+    if len(text) != 7 or text[2] != ".":
+        return False
+    if not (text[0:2] + text[3:7]).isdecimal():
+        return False
+    monat = int(text[0:2])
+    if monat < 1 or monat > 12:
+        return False
+    return True
+
+
+def frage_monat():
+    # Fragt den Monat, bis er gültig ist, und gibt ihn zurück
+    text = input("Monat (MM.JJJJ): ")
+    while not ist_gueltiger_monat(text):
+        print("Ungültiger Monat (MM.JJJJ).")
+        text = input("Monat (MM.JJJJ): ")
+    return text
