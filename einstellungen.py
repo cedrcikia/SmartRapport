@@ -15,7 +15,7 @@ STANDARD = {
 
 
 def lade_einstellungen():
-    """Liest einstellungen.txt. Fehlt die Datei, gelten die Standardwerte."""
+    """US-01: Liest einstellungen.txt. Fehlt die Datei, gelten die Standardwerte."""
     if not Path(DATEINAME).exists():
         speichere_einstellungen(STANDARD)
         return dict(STANDARD)
@@ -40,11 +40,13 @@ def speichere_einstellungen(einstellungen):
         for schluessel, wert in einstellungen.items():
             if schluessel == "stundenlohn":
                 datei.write(f"{schluessel}={wert:.2f}\n")
+            elif schluessel == "zuschlag" or schluessel == "ahv" or schluessel == "alv" or schluessel == "nbu":
+                datei.write(f"{schluessel}={wert:g}\n")
             else:
                 datei.write(f"{schluessel}={wert}\n")
 
 
-def stundenlohn_eingeben(einstellungen):
+def stundenlohn_speichern(einstellungen):
     """US-01: fragt, bis der Lohn gültig ist, speichert und bestätigt."""
     text = input("Stundenlohn: ")
     while not text.replace(".", "", 1).isdecimal() or float(text) <= 0:
@@ -56,7 +58,7 @@ def stundenlohn_eingeben(einstellungen):
     print(f"Stundenlohn gespeichert: CHF {betrag:.2f}")
 
 
-def sollzeit_eingeben(einstellungen):
+def sollzeit_speichern(einstellungen):
     """US-02: fragt, bis die Sollzeit pro Tag gültig ist, speichert in Minuten, bestätigt sie."""
     text = input("Stunden: ")
     while not text.isdecimal() or int(text) < 1 or int(text) > 24:
@@ -72,3 +74,29 @@ def sollzeit_eingeben(einstellungen):
     einstellungen["soll_min"] = stunden * 60 + minuten
     speichere_einstellungen(einstellungen)
     print(f"Sollzeit gespeichert: {stunden} Std {minuten:02d} Min pro Tag")
+
+
+def frage_prozent(frage):
+    """Fragt nach einem Prozentwert, prüft bis er gültig ist und gibt ihn zurück."""
+    text = input(frage) 
+    while not text.replace(".", "", 1).isdecimal() or float(text)  > 100:
+        print("Ungültiger Prozentwert (0 bis 100).")
+        text = input(frage)
+    prozent = float(text)
+    return prozent
+
+
+def saetze_speichern(einstellungen):
+    """US-03: fragt nach Zuschlag, AHV, ALV und NBU, speichert sie und bestätigt."""
+    print("[EINSTELLUNGEN - ZUSCHLAG UND ABZÜGE]")
+    zuschlag = frage_prozent("Überstunden-Zuschlag in %: ")
+    ahv = frage_prozent("AHV-Abzug in %: ")
+    alv = frage_prozent("ALV-Abzug in %: ")
+    nbu = frage_prozent("NBU-Abzug in %: ")
+    einstellungen["zuschlag"] = zuschlag
+    einstellungen["ahv"] = ahv
+    einstellungen["alv"] = alv
+    einstellungen["nbu"] = nbu
+    speichere_einstellungen(einstellungen)
+    print("Sätze gespeichert")
+
