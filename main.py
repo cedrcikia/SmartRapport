@@ -1,12 +1,35 @@
 # main.py · Person B · Hauptmenü von SmartRapport (Festlegung 8)
 
-from einstellungen import lade_einstellungen, stundenlohn_eingeben
+from datetime import date
+
+from berechnung import zeige_uebersicht
+from einstellungen import (lade_einstellungen, sollzeit_eingeben,
+                           stundenlohn_eingeben)
+from erfassen import arbeitstag_eintragen
+from erinnerung import pruefe_erinnerung
+from rapport import rapport_speichern
+from verwaltung import aendern_loeschen, zeige_eintraege
+
+
+# DUMMY – wird später durch lade_eintraege() aus speicher.py ersetzt (US-06)
+def lade_eintraege():
+    # Liest noch nicht aus stunden.txt, startet mit leerer Liste
+    return []
+
+
+# DUMMY – wird später durch saetze_eingeben() aus einstellungen.py ersetzt (US-03)
+def saetze_eingeben(einstellungen):
+    print("Noch nicht umgesetzt.")
 
 
 def main():
-    """Zeigt das Hauptmenü, bis der Benutzer 9 wählt."""
-    # Einstellungen einmal beim Start laden (Festlegung 7)
+    """Startablauf laut Teamplan, dann Hauptmenü, bis der Benutzer 9 wählt."""
+    # Einstellungen und Einträge einmal beim Start laden (Festlegung 7)
     einstellungen = lade_einstellungen()
+    eintraege = lade_eintraege()
+
+    # US-09: beim Start an den Abgabetermin erinnern
+    pruefe_erinnerung(date.today())
 
     # Endlosschleife, damit das Menü nach jeder Funktion wieder erscheint
     while True:
@@ -25,15 +48,28 @@ def main():
         # Vergleich als Text statt int(): so stürzt "abc" nicht ab
         wahl = input("Deine Wahl: ")
 
-        if wahl == "6":
+        if wahl == "1":
+            arbeitstag_eintragen(eintraege)
+        elif wahl == "2":
+            zeige_eintraege(eintraege)
+        elif wahl == "3":
+            aendern_loeschen(eintraege)
+        elif wahl == "4":
+            zeige_uebersicht(eintraege, einstellungen)
+        elif wahl == "5":
+            rapport_speichern(eintraege, einstellungen)
+        elif wahl == "6":
             stundenlohn_eingeben(einstellungen)
+        elif wahl == "7":
+            sollzeit_eingeben(einstellungen)
+        elif wahl == "8":
+            saetze_eingeben(einstellungen)
         elif wahl == "9":
+            # alles wurde schon beim Ändern gespeichert, darum nur Abschied
             print("Auf Wiedersehen!")
             break  # einziger Ausgang aus der Schleife
-        elif wahl in ["1", "2", "3", "4", "5", "7", "8"]:
-            # Platzhalter, bis die anderen Funktionen fertig sind
-            print("Noch nicht umgesetzt.")
         else:
+            # 0, 10, abc oder leer
             print("Ungültige Wahl.")
 
 
