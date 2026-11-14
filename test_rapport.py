@@ -23,11 +23,11 @@ assert abgabetermin("02.2028") == "29.02.2028"
 
 # Test 3: der ganze Rapport stimmt mit dem Beispiel im README überein
 erwartet = [
-    "SMARTRAPPORT - RAPPORT 10.2026",
+    "SMARTRAPPORT – RAPPORT 10.2026",
     "Abgabetermin: 31.10.2026",
     "-" * 40,
-    "1. 05.10.2026  07:30-17:00  Pause 45 Min  8 Std 45 Min",
-    "2. 06.10.2026  08:00-16:00  Pause 30 Min  7 Std 30 Min",
+    "1. 05.10.2026  07:30–17:00  Pause 45 Min  8 Std 45 Min",
+    "2. 06.10.2026  08:00–16:00  Pause 30 Min  7 Std 30 Min",
     "Total: 16 Std 15 Min",
     "-" * 40,
     "Normalstunden:     15 Std 30 Min",
