@@ -1,0 +1,89 @@
+# Automatische Tests für die Hilfsfunktionen (Prüfungen aus US-04, US-07,
+# Umwandlungen, Abgabetermin, Dateiname).
+# Die Werte stammen aus den Akzeptanzkriterien im README.
+# Start im Hauptordner: python -m tests.test_hilfen
+from src.hilfen import (baue_rapport_dateiname, berechne_abgabetermin,
+                        berechne_arbeitszeit_min,
+                        filtere_eintraege_nach_monat, hat_eintrag_fuer_datum,
+                        ist_dezimalzahl, ist_gueltige_uhrzeit,
+                        ist_gueltiger_monat, ist_gueltiges_datum,
+                        ist_nur_ziffern, wandle_minuten_in_text_um,
+                        wandle_zeit_in_minuten_um, zaehle_tage_im_monat)
+
+# US-04: Datum
+assert ist_gueltiges_datum("05.10.2026")
+assert not ist_gueltiges_datum("31.02.2026")
+assert not ist_gueltiges_datum("5.10.26")
+assert not ist_gueltiges_datum("abc")
+assert ist_gueltiges_datum("29.02.2028")  # Schaltjahr
+assert not ist_gueltiges_datum("29.02.2026")
+
+# US-04: Uhrzeit
+assert ist_gueltige_uhrzeit("07:30")
+assert ist_gueltige_uhrzeit("23:59")
+assert not ist_gueltige_uhrzeit("7:30")
+assert not ist_gueltige_uhrzeit("24:00")
+assert not ist_gueltige_uhrzeit("25:00")
+assert not ist_gueltige_uhrzeit("abc")
+
+# US-07: Monat
+assert ist_gueltiger_monat("10.2026")
+assert not ist_gueltiger_monat("13.2026")
+assert not ist_gueltiger_monat("00.2026")
+assert not ist_gueltiger_monat("2026")
+assert not ist_gueltiger_monat("abc")
+
+# Zahlen als Text
+assert ist_nur_ziffern("45")
+assert not ist_nur_ziffern("")
+assert not ist_nur_ziffern("4.5")
+assert not ist_nur_ziffern("-5")
+assert ist_dezimalzahl("32.50")
+assert ist_dezimalzahl("5")
+assert not ist_dezimalzahl("32,50")
+assert not ist_dezimalzahl("abc")
+assert not ist_dezimalzahl("")
+
+# Tage im Monat
+assert zaehle_tage_im_monat(2, 2026) == 28
+assert zaehle_tage_im_monat(2, 2028) == 29
+assert zaehle_tage_im_monat(2, 2100) == 28
+assert zaehle_tage_im_monat(4, 2026) == 30
+assert zaehle_tage_im_monat(10, 2026) == 31
+
+# Zeit und Dauer umwandeln
+assert wandle_zeit_in_minuten_um("07:30") == 450
+assert wandle_minuten_in_text_um(525) == "8 Std 45 Min"
+assert wandle_minuten_in_text_um(0) == "0 Std 00 Min"
+eintrag = {"datum": "05.10.2026", "start": "07:30", "ende": "17:00",
+           "pause_min": 45}
+assert berechne_arbeitszeit_min(eintrag) == 525
+
+# Abgabetermin ist der letzte Tag des Monats
+assert berechne_abgabetermin("10.2026") == "31.10.2026"
+assert berechne_abgabetermin("11.2026") == "30.11.2026"
+assert berechne_abgabetermin("12.2026") == "31.12.2026"
+assert berechne_abgabetermin("02.2026") == "28.02.2026"
+assert berechne_abgabetermin("02.2028") == "29.02.2028"
+
+# Dateiname des Rapports
+assert baue_rapport_dateiname("10.2026") == "rapport_10_2026.txt"
+
+# Einträge eines Monats, nach Datum sortiert
+eintraege = [
+    {"datum": "12.11.2026", "start": "08:00", "ende": "17:00",
+     "pause_min": 60},
+    {"datum": "06.10.2026", "start": "08:00", "ende": "16:00",
+     "pause_min": 30},
+    {"datum": "05.10.2026", "start": "07:30", "ende": "17:00",
+     "pause_min": 45},
+]
+oktober = filtere_eintraege_nach_monat(eintraege, "10.2026")
+assert [e["datum"] for e in oktober] == ["05.10.2026", "06.10.2026"]
+assert filtere_eintraege_nach_monat(eintraege, "09.2026") == []
+
+# Gibt es das Datum schon?
+assert hat_eintrag_fuer_datum(eintraege, "05.10.2026")
+assert not hat_eintrag_fuer_datum(eintraege, "07.10.2026")
+
+print("Alle Tests bestanden")

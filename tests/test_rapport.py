@@ -1,7 +1,7 @@
 # Automatische Tests für US-12. Geprüft werden die Funktionen, die den
 # Text bauen. Das Beispiel stammt aus den Akzeptanzkriterien im README.
-from hilfen import rapport_dateiname, abgabetermin
-from rapport import baue_rapport
+# Start im Hauptordner: python -m tests.test_rapport
+from src.rapport import baue_rapport
 
 eintraege = [
     {"datum": "05.10.2026", "start": "07:30", "ende": "17:00",
@@ -12,16 +12,7 @@ eintraege = [
 einstellungen = {"soll_min": 480, "stundenlohn": 32.50, "zuschlag": 25,
                  "ahv": 5.3, "alv": 1.1, "nbu": 3.74}
 
-# Test 1: Dateiname aus dem Monat
-assert rapport_dateiname("10.2026") == "rapport_10_2026.txt"
-
-# Test 2: Abgabetermin ist der letzte Tag des Monats
-assert abgabetermin("10.2026") == "31.10.2026"
-assert abgabetermin("11.2026") == "30.11.2026"
-assert abgabetermin("02.2026") == "28.02.2026"
-assert abgabetermin("02.2028") == "29.02.2028"
-
-# Test 3: der ganze Rapport stimmt mit dem Beispiel im README überein
+# Der ganze Rapport stimmt mit dem Beispiel im README überein
 erwartet = [
     "SMARTRAPPORT – RAPPORT 10.2026",
     "Abgabetermin: 31.10.2026",

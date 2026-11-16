@@ -2,60 +2,13 @@
 
 from pathlib import Path
 
-DATEINAME = "stunden.txt"
+from src.hilfen import (hat_eintrag_fuer_datum, ist_gueltige_uhrzeit,
+                        ist_gueltiges_datum, ist_nur_ziffern,
+                        wandle_zeit_in_minuten_um)
+from src.pfade import STUNDEN_DATEI
 
 
-def nur_ziffern(text):
-    """DUMMY: True, wenn der Text nicht leer ist und nur Ziffern hat."""
-    if len(text) == 0:
-        return False
-    for zeichen in text:
-        if zeichen not in "0123456789":
-            return False
-    return True
-
-
-def ist_gueltige_uhrzeit(text):
-    """DUMMY: True bei einer Uhrzeit HH:MM von 00:00 bis 23:59."""
-    if len(text) != 5 or text[2] != ":":
-        return False
-    if not nur_ziffern(text[0:2]) or not nur_ziffern(text[3:5]):
-        return False
-    return int(text[0:2]) <= 23 and int(text[3:5]) <= 59
-
-
-def ist_gueltiges_datum(text):
-    """DUMMY: True bei einem Datum im Format TT.MM.JJJJ.
-
-    Prüft nur das Format, nicht ob es den Tag gibt (z. B. 31.02.).
-    Das macht die richtige Version von Cédric.
-    """
-    if len(text) != 10 or text[2] != "." or text[5] != ".":
-        return False
-    tag = text[0:2]
-    monat = text[3:5]
-    jahr = text[6:10]
-    if not nur_ziffern(tag) or not nur_ziffern(monat):
-        return False
-    if not nur_ziffern(jahr):
-        return False
-    return 1 <= int(tag) <= 31 and 1 <= int(monat) <= 12
-
-
-def zeit_zu_minuten(text):
-    """DUMMY: Wandelt "07:30" in Minuten um (450)."""
-    return int(text[0:2]) * 60 + int(text[3:5])
-
-
-def datum_existiert(eintraege, datum):
-    """DUMMY: True, wenn es für dieses Datum schon einen Eintrag gibt."""
-    for eintrag in eintraege:
-        if eintrag["datum"] == datum:
-            return True
-    return False
-
-
-def eintrag_zu_zeile(eintrag):
+def wandle_eintrag_in_zeile_um(eintrag):
     """Wandelt einen Eintrag in eine Zeile für stunden.txt um.
 
     Story: US-06 (Teil: Processing)
@@ -79,6 +32,9 @@ def eintrag_zu_zeile(eintrag):
 
 
 def ist_gueltige_zeile(felder):
+    """True, wenn die Felder einer Zeile gleich gültig sind wie beim
+    Eintragen (US-04 und US-05).
+    """
     # Zuerst die Anzahl prüfen, sonst gibt felder[3] einen IndexError
     if len(felder) != 4:
         return False
@@ -92,29 +48,33 @@ def ist_gueltige_zeile(felder):
     if not ist_gueltige_uhrzeit(start) or not ist_gueltige_uhrzeit(ende):
         return False
 
-    start_min = zeit_zu_minuten(start)
-    ende_min = zeit_zu_minuten(ende)
+    start_min = wandle_zeit_in_minuten_um(start)
+    ende_min = wandle_zeit_in_minuten_um(ende)
     if ende_min <= start_min:
         return False
 
     # Pause zuerst als Text prüfen, damit "abc" oder "4.5" nicht
     # bei int() abstürzt
-    if not nur_ziffern(pause_text):
+    if not ist_nur_ziffern(pause_text):
         return False
     if int(pause_text) >= ende_min - start_min:
         return False
     return True
 
 
-def speichere_eintraege(eintraege, dateiname=DATEINAME):
+def speichere_eintraege(eintraege, dateiname=STUNDEN_DATEI):
+    """Schreibt die ganze Liste in die Datei, eine Zeile pro Eintrag."""
     # "w" ersetzt den alten Inhalt, weil immer die ganze Liste
     # geschrieben wird (auch nach Ändern oder Löschen)
     with open(dateiname, "w", encoding="utf-8") as datei:
         for eintrag in eintraege:
-            datei.write(eintrag_zu_zeile(eintrag) + "\n")
+            datei.write(wandle_eintrag_in_zeile_um(eintrag) + "\n")
 
 
-def lade_eintraege(dateiname=DATEINAME):
+def lade_eintraege(dateiname=STUNDEN_DATEI):
+    """Liest die Einträge aus der Datei. Kaputte Zeilen werden übersprungen
+    und gemeldet.
+    """
     eintraege = []
     # Fehlt die Datei, startet die App mit einer leeren Liste
     if not Path(dateiname).exists():
@@ -133,7 +93,7 @@ def lade_eintraege(dateiname=DATEINAME):
             if not ist_gueltige_zeile(felder):
                 print(f"Zeile {nummer} übersprungen: {zeile}")
                 continue
-            if datum_existiert(eintraege, felder[0]):
+            if hat_eintrag_fuer_datum(eintraege, felder[0]):
                 print(f"Zeile {nummer} übersprungen: Datum doppelt")
                 continue
             eintrag = {

@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+
+# echte Daten der App (Stunden, Einstellungen, Rapporte)
+daten/
+
+# Testdateien, die die Tests selbst anlegen
+tests/testdaten/*_test.txt
+tests/testdaten/rapport_*.txt

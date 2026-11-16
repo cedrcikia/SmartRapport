@@ -32,7 +32,7 @@ Die Konsole bedient immer der Temporäre. Die Lohnbuchhaltung hat Anforderungen 
 4. **Lohn:** Bruttolohn = Normalstunden × Stundenlohn + Überstunden × Stundenlohn × (1 + Zuschlag in % / 100). Jeder Abzug ist ein Prozentsatz vom Bruttolohn. Nettolohn = Bruttolohn minus alle Abzüge. Der Nettolohn ist nur ein ungefährer Wert, weil weitere Abzüge wie BVG oder Quellensteuer nicht berücksichtigt werden.
 5. **Geld:** Alle Beträge sind in CHF mit zwei Nachkommastellen. Zuerst wird der Bruttolohn auf zwei Stellen gerundet, dann wird jeder Abzug einzeln von diesem Betrag berechnet und gerundet. Als Dezimaltrennzeichen gilt nur der Punkt (`32.50`), ein Komma (`32,50`) ist ungültig.
 6. **Abgabetermin:** Der Rapport eines Monats muss bis zum letzten Tag dieses Monats abgegeben werden (z.B. Rapport Oktober 2026 bis 31.10.2026, Rapport Februar 2026 bis 28.02.2026).
-7. **Dateien:**
+7. **Dateien:** Alle Dateien der App liegen im Ordner `daten/`, den die App beim Start selbst anlegt.
    * `stunden.txt`: eine Zeile pro Eintrag, `05.10.2026;07:30;17:00;45` (Datum, Start, Ende, Pause in Minuten).
    * `einstellungen.txt`: eine Zeile pro Wert als `schluessel=wert`: `stundenlohn`, `soll_min` (tägliche Sollzeit in Minuten), `zuschlag`, `ahv`, `alv`, `nbu`. Gibt es die Datei nicht, wird sie beim Start mit Standardwerten angelegt (Stundenlohn 30.00, Sollzeit 8 Std 00 Min, Zuschlag 25, AHV 5.3, ALV 1.1, NBU 3.74).
 8. **Hauptmenü:** Nach dem Start zeigt die App dieses Menü:
@@ -254,13 +254,64 @@ Netto:             CHF 480.05
 
 | Person | Name | Stories | Eigene Dateien |
 |---|---|---|---|
-| **A** | Cédric Kialunda | US-01 Stundenlohn, US-02 Sollzeit, US-03 Zuschlag und Abzüge | `einstellungen.py`, `hilfen.py` |
-| **B** | Leonard Qelaj | US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung, Hauptmenü (Festlegung 8) | `erfassen.py`, `erinnerung.py`, `main.py` |
-| **C** | Bledi Isufi | US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `speicher.py`, `verwaltung.py` |
-| **D** | Rafaa El Sherkasi | US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `berechnung.py`, `rapport.py` |
+| **A** | Cédric Kialunda | US-01 Stundenlohn, US-02 Sollzeit, US-03 Zuschlag und Abzüge | `src/einstellungen.py`, `src/hilfen.py`, `src/pfade.py` |
+| **B** | Leonard Qelaj | US-04 Arbeitstag, US-05 Pause, US-09 Erinnerung, Hauptmenü (Festlegung 8) | `src/erfassung.py`, `src/erinnerung.py`, `main.py` |
+| **C** | Bledi Isufi | US-06 Speichern und Laden, US-07 Einträge anzeigen, US-08 Ändern und Löschen | `src/speicher.py`, `src/verwaltung.py` |
+| **D** | Rafaa El Sherkasi | US-10 Überstunden, US-11 Übersicht, US-12 Rapport-Datei | `src/berechnung.py`, `src/rapport.py` |
 
 **Warum so:**
-* A schreibt dreimal dasselbe Muster (fragen, prüfen, speichern). Dazu kommt `hilfen.py`, eine Sammlung kleiner Funktionen, die alle brauchen.
+* A schreibt dreimal dasselbe Muster (fragen, prüfen, speichern). Dazu kommt `src/hilfen.py`, eine Sammlung kleiner Funktionen, die alle brauchen.
 * B prüft Eingaben (Datum, Uhrzeit, Pause) und baut das Hauptmenü.
 * C arbeitet mit Listen und Dictionaries: Dateien lesen und schreiben, sortieren, nummerieren, ändern, löschen.
 * D rechnet: Überstunden pro Tag, Lohn, Abzüge, Rundung, und schreibt die Rapport-Datei.
+
+---
+
+## ⚙️ Implementation
+
+### Technologie
+* Python 3.x, nur die Standardbibliothek (`os`, `pathlib`, `datetime`). Keine externen Bibliotheken.
+* Konsolenanwendung, ohne Website und ohne Zusatzprogramme.
+
+### Projektstruktur
+
+```
+SmartRapport/
+├── main.py                 # Start der App und Hauptmenü
+├── README.md
+├── src/                    # der ganze Programmcode
+│   ├── berechnung.py       # Überstunden, Lohn, Übersicht (US-10, US-11)
+│   ├── einstellungen.py    # Stundenlohn, Sollzeit, Zuschlag, Abzüge (US-01 bis US-03)
+│   ├── erfassung.py        # Arbeitstag und Pause eintragen (US-04, US-05)
+│   ├── erinnerung.py       # Erinnerung an den Abgabetermin (US-09)
+│   ├── hilfen.py           # gemeinsame Hilfsfunktionen
+│   ├── pfade.py            # Speicherorte der Dateien
+│   ├── rapport.py          # Rapport als Textdatei (US-12)
+│   ├── speicher.py         # Einträge speichern und laden (US-06)
+│   └── verwaltung.py       # Einträge anzeigen, ändern, löschen (US-07, US-08)
+├── tests/                  # automatische Tests und Beispieldateien
+├── daten/                  # wird von der App angelegt: stunden.txt, einstellungen.txt, Rapporte
+└── docs/teamplan.md        # interner Teamplan
+```
+
+### Starten
+Im Hauptordner des Projekts:
+
+```
+python main.py
+```
+
+Beim ersten Start legt die App den Ordner `daten/` und die Datei `einstellungen.txt` mit Standardwerten an.
+
+### Tests
+Im Hauptordner:
+
+```
+python -m tests.alle_tests
+```
+
+### Dateien und Bibliotheken
+* `daten/stunden.txt`: alle Einträge, eine Zeile pro Tag (`05.10.2026;07:30;17:00;45`).
+* `daten/einstellungen.txt`: Stundenlohn, Sollzeit, Zuschlag und Abzüge (`schluessel=wert`).
+* `daten/rapport_MM_JJJJ.txt`: der gespeicherte Rapport eines Monats.
+* `os`: legt den Ordner `daten/` an. `pathlib`: baut die Dateipfade und prüft, ob eine Datei existiert. `datetime`: liefert das heutige Datum für die Erinnerung.

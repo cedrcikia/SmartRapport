@@ -1,69 +1,69 @@
 # main.py · Person B · Hauptmenü von SmartRapport (Festlegung 8)
+# Start der App: python main.py
 
 from datetime import date
 
-from berechnung import zeige_uebersicht
-from einstellungen import (lade_einstellungen, sollzeit_eingeben,
-                           stundenlohn_eingeben)
-from erfassen import arbeitstag_eintragen
-from erinnerung import pruefe_erinnerung
-from rapport import rapport_speichern
-from verwaltung import aendern_loeschen, zeige_eintraege
+from src.berechnung import zeige_uebersicht
+from src.einstellungen import (aendere_sollzeit, aendere_stundenlohn,
+                               aendere_zuschlag_und_abzuege,
+                               lade_einstellungen)
+from src.erfassung import trage_arbeitstag_ein
+from src.erinnerung import zeige_erinnerung
+from src.pfade import lege_daten_ordner_an
+from src.rapport import speichere_rapport
+from src.speicher import lade_eintraege
+from src.verwaltung import aendere_oder_loesche_eintrag, zeige_eintraege
 
 
-# DUMMY – wird später durch lade_eintraege() aus speicher.py ersetzt (US-06)
-def lade_eintraege():
-    # Liest noch nicht aus stunden.txt, startet mit leerer Liste
-    return []
+def zeige_hauptmenue():
+    """Zeigt das Hauptmenü mit den Punkten 1 bis 9."""
+    print()
+    print("[SMARTRAPPORT - HAUPTMENÜ]")
+    print("1. Arbeitstag eintragen")
+    print("2. Einträge anzeigen")
+    print("3. Eintrag ändern oder löschen")
+    print("4. Übersicht anzeigen")
+    print("5. Rapport speichern")
+    print("6. Stundenlohn ändern")
+    print("7. Sollzeit ändern")
+    print("8. Zuschlag und Abzüge ändern")
+    print("9. Beenden")
 
 
-# DUMMY – wird später durch saetze_eingeben() aus einstellungen.py ersetzt (US-03)
-def saetze_eingeben(einstellungen):
-    print("Noch nicht umgesetzt.")
-
-
-def main():
+def starte_app():
     """Startablauf laut Teamplan, dann Hauptmenü, bis der Benutzer 9 wählt."""
-    # Einstellungen und Einträge einmal beim Start laden (Festlegung 7)
+    # Ordner für die Dateien anlegen, dann Einstellungen und Einträge
+    # einmal beim Start laden (Festlegung 7)
+    lege_daten_ordner_an()
     einstellungen = lade_einstellungen()
     eintraege = lade_eintraege()
 
     # US-09: beim Start an den Abgabetermin erinnern
-    pruefe_erinnerung(date.today())
+    zeige_erinnerung(date.today())
 
     # Endlosschleife, damit das Menü nach jeder Funktion wieder erscheint
     while True:
-        print()
-        print("[SMARTRAPPORT - HAUPTMENÜ]")
-        print("1. Arbeitstag eintragen")
-        print("2. Einträge anzeigen")
-        print("3. Eintrag ändern oder löschen")
-        print("4. Übersicht anzeigen")
-        print("5. Rapport speichern")
-        print("6. Stundenlohn ändern")
-        print("7. Sollzeit ändern")
-        print("8. Zuschlag und Abzüge ändern")
-        print("9. Beenden")
+        zeige_hauptmenue()
 
         # Vergleich als Text statt int(): so stürzt "abc" nicht ab
         wahl = input("Deine Wahl: ")
 
         if wahl == "1":
-            arbeitstag_eintragen(eintraege)
+            trage_arbeitstag_ein(eintraege)
         elif wahl == "2":
             zeige_eintraege(eintraege)
         elif wahl == "3":
-            aendern_loeschen(eintraege)
+            aendere_oder_loesche_eintrag(eintraege)
         elif wahl == "4":
             zeige_uebersicht(eintraege, einstellungen)
         elif wahl == "5":
-            rapport_speichern(eintraege, einstellungen)
+            speichere_rapport(eintraege, einstellungen)
         elif wahl == "6":
-            stundenlohn_eingeben(einstellungen)
+            aendere_stundenlohn(einstellungen)
         elif wahl == "7":
-            sollzeit_eingeben(einstellungen)
+            aendere_sollzeit(einstellungen)
         elif wahl == "8":
-            saetze_eingeben(einstellungen)
+            aendere_zuschlag_und_abzuege(einstellungen)
         elif wahl == "9":
             # alles wurde schon beim Ändern gespeichert, darum nur Abschied
             print("Auf Wiedersehen!")
@@ -75,4 +75,4 @@ def main():
 
 # Startet das Menü nur, wenn main.py direkt ausgeführt wird
 if __name__ == "__main__":
-    main()
+    starte_app()
