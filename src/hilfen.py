@@ -1,6 +1,8 @@
 # hilfen.py · Person A · Hilfsfunktionen für das ganze Team
 # Prüfen, Umwandeln und Fragen, die mehrere Dateien brauchen.
 
+from pathlib import Path
+
 from src.pfade import DATEN_ORDNER
 
 
@@ -151,6 +153,47 @@ def baue_rapport_dateiname(monat):
 def baue_rapport_pfad(monat, ordner=DATEN_ORDNER):
     """Voller Pfad des Rapports im Ordner daten/ (oder in einem anderen)."""
     return ordner / baue_rapport_dateiname(monat)
+
+
+# ---------- Dateien lesen und schreiben ----------
+
+def lese_zeilen_aus_datei(pfad):
+    """Liest alle Zeilen einer Textdatei und gibt sie als Liste zurück.
+    Gibt None zurück, wenn es die Datei nicht gibt oder sie nicht gelesen
+    werden darf. Die App stürzt in beiden Fällen nicht ab.
+    """
+    try:
+        # errors="replace": ein kaputtes Zeichen wird zu einem Ersatzzeichen.
+        # Die Zeile ist dann ungültig und wird später übersprungen
+        with open(pfad, "r", encoding="utf-8", errors="replace") as datei:
+            zeilen = []
+            for zeile in datei:
+                # Ersatzzeichen durch ? ersetzen, damit sich die Zeile in
+                # jeder Konsole ausgeben lässt
+                zeilen.append(zeile.replace("\ufffd", "?"))
+            return zeilen
+    except FileNotFoundError:
+        return None
+    except PermissionError:
+        print(f"Datei kann nicht gelesen werden: {Path(pfad).name}")
+        return None
+
+
+def schreibe_zeilen_in_datei(pfad, zeilen):
+    """Schreibt die Zeilen in die Datei. Gibt True zurück, wenn es geklappt
+    hat, sonst False und eine Meldung.
+    """
+    try:
+        # Ordner anlegen, falls es ihn nicht (mehr) gibt
+        Path(pfad).parent.mkdir(parents=True, exist_ok=True)
+        with open(pfad, "w", encoding="utf-8") as datei:
+            for zeile in zeilen:
+                datei.write(zeile + "\n")
+    except OSError as fehler:
+        print(f"Speichern nicht möglich ({Path(pfad).name}): "
+              f"{fehler.strerror}")
+        return False
+    return True
 
 
 # ---------- Fragen ----------

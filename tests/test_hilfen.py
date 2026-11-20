@@ -2,12 +2,15 @@
 # Umwandlungen, Abgabetermin, Dateiname).
 # Die Werte stammen aus den Akzeptanzkriterien im README.
 # Start im Hauptordner: python -m tests.test_hilfen
+from pathlib import Path
+
 from src.hilfen import (baue_rapport_dateiname, berechne_abgabetermin,
                         berechne_arbeitszeit_min,
                         filtere_eintraege_nach_monat, hat_eintrag_fuer_datum,
                         ist_dezimalzahl, ist_gueltige_uhrzeit,
                         ist_gueltiger_monat, ist_gueltiges_datum,
-                        ist_nur_ziffern, wandle_minuten_in_text_um,
+                        ist_nur_ziffern, lese_zeilen_aus_datei,
+                        schreibe_zeilen_in_datei, wandle_minuten_in_text_um,
                         wandle_zeit_in_minuten_um, zaehle_tage_im_monat)
 
 # US-04: Datum
@@ -85,5 +88,33 @@ assert filtere_eintraege_nach_monat(eintraege, "09.2026") == []
 # Gibt es das Datum schon?
 assert hat_eintrag_fuer_datum(eintraege, "05.10.2026")
 assert not hat_eintrag_fuer_datum(eintraege, "07.10.2026")
+
+
+# Dateien lesen und schreiben: fehlende Datei, fehlender Ordner, kaputte
+# Zeichen. Nichts davon darf die App zum Absturz bringen.
+TESTDATEN = Path(__file__).resolve().parent / "testdaten"
+NEUER_ORDNER = TESTDATEN / "neuer_ordner_test"
+DATEI = NEUER_ORDNER / "datei_test.txt"
+
+# Fehlende Datei gibt None statt eines Absturzes
+assert lese_zeilen_aus_datei(TESTDATEN / "gibt_es_nicht.txt") is None
+
+# Schreiben legt einen fehlenden Ordner an und gibt True zurück
+assert not NEUER_ORDNER.exists()
+assert schreibe_zeilen_in_datei(DATEI, ["a;1", "b;2"])
+assert DATEI.exists()
+assert lese_zeilen_aus_datei(DATEI) == ["a;1\n", "b;2\n"]
+
+# Kaputte Zeichen werden zu ?, die Datei lässt sich trotzdem lesen
+DATEI.write_bytes(b"gut\n\xff\xfe\x00schlecht\n")
+zeilen = lese_zeilen_aus_datei(DATEI)
+assert zeilen[0] == "gut\n"
+assert "?" in zeilen[1]
+
+# Schreiben in einen Pfad, der ein Ordner ist, gibt False statt Absturz
+assert not schreibe_zeilen_in_datei(NEUER_ORDNER, ["x"])
+
+DATEI.unlink()
+NEUER_ORDNER.rmdir()
 
 print("Alle Tests bestanden")

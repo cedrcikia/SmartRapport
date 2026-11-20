@@ -61,6 +61,7 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 * **`eintraege`** ist die Liste aller Einträge, **`monats_eintraege`** die Einträge eines Monats, **`eintrag`** ein einzelner.
 * **`eingabe`** ist das, was die Person getippt hat.
 * Schlüssel in Dictionaries sind klein geschrieben (`"ahv"`, nicht `"AHV"`).
+* **Dateizugriffe nur über `lese_zeilen_aus_datei` und `schreibe_zeilen_in_datei`.** Dort stehen die `try`/`except`-Blöcke (`FileNotFoundError`, `PermissionError`, `OSError`). So stürzt die App nicht ab, wenn eine Datei fehlt, gelöscht wird oder nicht beschreibbar ist.
 
 ---
 
@@ -121,6 +122,8 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 | `berechne_abgabetermin(monat)` | Text | `"10.2026"` wird zu `"31.10.2026"` (letzter Tag des Monats) |
 | `baue_rapport_dateiname(monat)` | Text | `"10.2026"` wird zu `"rapport_10_2026.txt"` |
 | `baue_rapport_pfad(monat, ordner)` | Pfad | voller Pfad des Rapports im Ordner `daten/` |
+| `lese_zeilen_aus_datei(pfad)` | Liste oder `None` | liest alle Zeilen einer Textdatei. Fehlt die Datei oder darf sie nicht gelesen werden, kommt `None` (mit `try`/`except`, kein Absturz). Kaputte Zeichen werden zu `?` |
+| `schreibe_zeilen_in_datei(pfad, zeilen)` | `True`/`False` | schreibt die Zeilen in die Datei und legt einen fehlenden Ordner an. Bei einem Fehler (z.B. schreibgeschützt) kommt eine Meldung und `False` (mit `try`/`except`, kein Absturz) |
 | `frage_ja_nein(frage)` | `True`/`False` | fragt `j/n`, bis die Eingabe stimmt |
 | `frage_monat()` | Text | fragt den Monat, bis er gültig ist |
 
@@ -128,8 +131,8 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 
 | Funktion | Zweck |
 |---|---|
-| `lade_einstellungen(dateiname)` | liest `einstellungen.txt`, legt sie mit Standardwerten an, falls sie fehlt. Gibt das Einstellungs-Dictionary zurück |
-| `speichere_einstellungen(einstellungen, dateiname)` | schreibt `einstellungen.txt` |
+| `lade_einstellungen(dateiname)` | liest `einstellungen.txt` (mit `lese_zeilen_aus_datei`), legt sie mit Standardwerten an, falls sie fehlt. Gibt das Einstellungs-Dictionary zurück |
+| `speichere_einstellungen(einstellungen, dateiname)` | schreibt `einstellungen.txt`. Gibt `True` zurück, wenn es geklappt hat |
 | `aendere_stundenlohn(einstellungen)` | US-01 |
 | `aendere_sollzeit(einstellungen)` | US-02 |
 | `frage_prozent(frage)` | fragt einen Prozentwert von 0 bis 100 |
@@ -158,8 +161,8 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 |---|---|
 | `wandle_eintrag_in_zeile_um(eintrag)` | `{"datum": ...}` wird zu `"05.10.2026;07:30;17:00;45"` |
 | `ist_gueltige_zeile(felder)` | prüft, ob die 4 Felder einer Zeile gültig sind (wie bei US-04 und US-05) |
-| `lade_eintraege(dateiname)` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen und doppelte Daten mit Meldung. Gibt die Liste der Einträge zurück |
-| `speichere_eintraege(eintraege, dateiname)` | schreibt die ganze Liste in `stunden.txt` |
+| `lade_eintraege(dateiname)` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen und doppelte Daten mit Meldung. Fehlt die Datei, kommt eine leere Liste. Gibt die Liste der Einträge zurück |
+| `speichere_eintraege(eintraege, dateiname)` | schreibt die ganze Liste in `stunden.txt`. Gibt `True` zurück, wenn es geklappt hat, sonst `False` |
 
 ### `src/verwaltung.py` (Person C)
 
@@ -250,3 +253,4 @@ Die Präsentation (15 Minuten, alle sprechen) findet in den letzten beiden Semes
 4. **NBU-Satz 3.74 %** in allen Beispielen und als Standardwert (Festlegung 7).
 5. **Auszahlung am 5. des Folgemonats** steht nur im Szenario, wird nicht programmiert.
 6. **Clean-up (16.11.2026):** Ordnerstruktur (`src/`, `tests/`, `daten/`, `docs/`), jede Funktion beginnt mit einem Verb, doppelte Funktionen nur noch in `src/hilfen.py`, einheitliche Namen (siehe Namensregeln).
+7. **Dateifehler (20.11.2026):** Gelöschte, fehlende, schreibgeschützte oder kaputte Dateien werden mit `try`/`except` abgefangen. Die App meldet den Fehler und läuft weiter.

@@ -4,7 +4,8 @@ from src.berechnung import baue_uebersicht_zeilen, berechne_monat
 from src.hilfen import (baue_rapport_dateiname, baue_rapport_pfad,
                         berechne_abgabetermin, berechne_arbeitszeit_min,
                         filtere_eintraege_nach_monat, frage_ja_nein,
-                        frage_monat, wandle_minuten_in_text_um)
+                        frage_monat, schreibe_zeilen_in_datei,
+                        wandle_minuten_in_text_um)
 
 TRENNLINIE = "-" * 40
 
@@ -52,7 +53,5 @@ def speichere_rapport(eintraege, einstellungen):
             print("Rapport nicht gespeichert.")
             return
     zeilen = baue_rapport(monat, monats_eintraege, einstellungen)
-    with open(pfad, "w", encoding="utf-8") as datei:
-        for zeile in zeilen:
-            datei.write(zeile + "\n")
-    print(f"Rapport gespeichert als {baue_rapport_dateiname(monat)}")
+    if schreibe_zeilen_in_datei(pfad, zeilen):
+        print(f"Rapport gespeichert als {baue_rapport_dateiname(monat)}")

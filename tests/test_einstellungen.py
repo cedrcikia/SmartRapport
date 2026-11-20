@@ -60,4 +60,15 @@ assert "nbu=3.74\n" in inhalt
 # Testdatei wieder löschen
 DATEI.unlink()
 
+
+# Test 8: kaputte Zeichen in der Datei: es gelten die Standardwerte
+DATEI.write_bytes(b"stundenlohn=\xff\xfe\nsoll_min=450\n")
+einstellungen = lade_einstellungen(DATEI)
+assert einstellungen["stundenlohn"] == 30.0
+assert einstellungen["soll_min"] == 450
+
+# Test 9: speichern gibt True zurück
+assert speichere_einstellungen(test, DATEI) is True
+DATEI.unlink()
+
 print("Alle Tests bestanden")

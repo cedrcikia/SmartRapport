@@ -1,9 +1,8 @@
 # speicher.py · Person C · US-06 Einträge speichern und laden
 
-from pathlib import Path
-
 from src.hilfen import (hat_eintrag_fuer_datum, ist_gueltige_uhrzeit,
                         ist_gueltiges_datum, ist_nur_ziffern,
+                        lese_zeilen_aus_datei, schreibe_zeilen_in_datei,
                         wandle_zeit_in_minuten_um)
 from src.pfade import STUNDEN_DATEI
 
@@ -63,12 +62,14 @@ def ist_gueltige_zeile(felder):
 
 
 def speichere_eintraege(eintraege, dateiname=STUNDEN_DATEI):
-    """Schreibt die ganze Liste in die Datei, eine Zeile pro Eintrag."""
-    # "w" ersetzt den alten Inhalt, weil immer die ganze Liste
-    # geschrieben wird (auch nach Ändern oder Löschen)
-    with open(dateiname, "w", encoding="utf-8") as datei:
-        for eintrag in eintraege:
-            datei.write(wandle_eintrag_in_zeile_um(eintrag) + "\n")
+    """Schreibt die ganze Liste in die Datei, eine Zeile pro Eintrag.
+    Gibt True zurück, wenn es geklappt hat, sonst False.
+    """
+    # Immer die ganze Liste, auch nach Ändern oder Löschen
+    zeilen = []
+    for eintrag in eintraege:
+        zeilen.append(wandle_eintrag_in_zeile_um(eintrag))
+    return schreibe_zeilen_in_datei(dateiname, zeilen)
 
 
 def lade_eintraege(dateiname=STUNDEN_DATEI):
@@ -76,31 +77,31 @@ def lade_eintraege(dateiname=STUNDEN_DATEI):
     und gemeldet.
     """
     eintraege = []
+    zeilen = lese_zeilen_aus_datei(dateiname)
     # Fehlt die Datei, startet die App mit einer leeren Liste
-    if not Path(dateiname).exists():
+    if zeilen is None:
         return eintraege
 
-    with open(dateiname, "r", encoding="utf-8") as datei:
-        nummer = 0
-        for zeile in datei:
-            nummer += 1
-            # Zeilenumbruch \n am Ende entfernen
-            zeile = zeile.strip()
-            # Leere Zeilen still überspringen (z. B. am Dateiende)
-            if zeile == "":
-                continue
-            felder = zeile.split(";")
-            if not ist_gueltige_zeile(felder):
-                print(f"Zeile {nummer} übersprungen: {zeile}")
-                continue
-            if hat_eintrag_fuer_datum(eintraege, felder[0]):
-                print(f"Zeile {nummer} übersprungen: Datum doppelt")
-                continue
-            eintrag = {
-                "datum": felder[0],
-                "start": felder[1],
-                "ende": felder[2],
-                "pause_min": int(felder[3]),
-            }
-            eintraege.append(eintrag)
+    nummer = 0
+    for zeile in zeilen:
+        nummer += 1
+        # Zeilenumbruch am Ende entfernen
+        zeile = zeile.strip()
+        # Leere Zeilen still überspringen (z. B. am Dateiende)
+        if zeile == "":
+            continue
+        felder = zeile.split(";")
+        if not ist_gueltige_zeile(felder):
+            print(f"Zeile {nummer} übersprungen: {zeile}")
+            continue
+        if hat_eintrag_fuer_datum(eintraege, felder[0]):
+            print(f"Zeile {nummer} übersprungen: Datum doppelt")
+            continue
+        eintrag = {
+            "datum": felder[0],
+            "start": felder[1],
+            "ende": felder[2],
+            "pause_min": int(felder[3]),
+        }
+        eintraege.append(eintrag)
     return eintraege

@@ -39,4 +39,21 @@ speichere_eintraege([eintrag], TESTDATEI)
 assert lade_eintraege(TESTDATEI) == [eintrag]
 TESTDATEI.unlink()
 
+
+# Test 7: speichern gibt True zurück, auch wenn der Ordner fehlt
+NEUER_ORDNER = TESTDATEN / "neuer_ordner_test"
+neue_datei = NEUER_ORDNER / "stunden_test.txt"
+assert speichere_eintraege([eintrag], neue_datei) is True
+assert lade_eintraege(neue_datei) == [eintrag]
+neue_datei.unlink()
+NEUER_ORDNER.rmdir()
+
+# Test 8: kaputte Zeichen in der Datei: gültige Zeilen werden geladen,
+# die kaputte Zeile wird übersprungen, kein Absturz
+TESTDATEI.write_bytes(b"05.10.2026;07:30;17:00;45\n"
+                      b"\xff\xfe\x00bad\n"
+                      b"06.10.2026;08:00;16:00;30\n")
+assert len(lade_eintraege(TESTDATEI)) == 2
+TESTDATEI.unlink()
+
 print("Alle Tests bestanden")

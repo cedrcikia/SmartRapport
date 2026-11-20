@@ -74,5 +74,5 @@ def trage_arbeitstag_ein(eintraege):
 
     # an die Liste anhängen und sofort speichern (US-06)
     eintraege.append(eintrag)
-    speichere_eintraege(eintraege)
-    print("Eintrag gespeichert")
+    if speichere_eintraege(eintraege):
+        print("Eintrag gespeichert")
