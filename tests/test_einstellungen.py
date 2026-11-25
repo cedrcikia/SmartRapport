@@ -1,4 +1,4 @@
-# Automatische Tests für US-01 bis US-03 (Speichern und Laden der Werte).
+# Automatische Tests für US-01 bis US-03 (Speichern und Laden).
 # Die Tests arbeiten mit einer eigenen Testdatei und fassen die echte
 # Datei daten/einstellungen.txt nicht an.
 # Start im Hauptordner: python -m tests.test_einstellungen
