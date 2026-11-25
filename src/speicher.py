@@ -9,19 +9,7 @@ from src.pfade import STUNDEN_DATEI
 
 def wandle_eintrag_in_zeile_um(eintrag):
     """Wandelt einen Eintrag in eine Zeile für stunden.txt um.
-
-    Story: US-06 (Teil: Processing)
-
-    Parameter:
-        eintrag (dict): Ein Eintrag mit datum, start, ende und
-            pause_min, z. B. {"datum": "05.10.2026",
-            "start": "07:30", "ende": "17:00", "pause_min": 45}
-
-    Rückgabe:
-        str: Zeile im Format Datum;Start;Ende;Pause,
-        z. B. "05.10.2026;07:30;17:00;45"
-
-    Wird aufgerufen von: speichere_eintraege
+    Beispiel: "05.10.2026;07:30;17:00;45" (Datum;Start;Ende;Pause)
     """
     datum = eintrag["datum"]
     start = eintrag["start"]
@@ -37,28 +25,38 @@ def ist_gueltige_zeile(felder):
     # Zuerst die Anzahl prüfen, sonst gibt felder[3] einen IndexError
     if len(felder) != 4:
         return False
-    datum = felder[0]
-    start = felder[1]
-    ende = felder[2]
-    pause_text = felder[3]
-
+    datum, start, ende, pause_text = felder
     if not ist_gueltiges_datum(datum):
         return False
     if not ist_gueltige_uhrzeit(start) or not ist_gueltige_uhrzeit(ende):
         return False
 
-    start_min = wandle_zeit_in_minuten_um(start)
-    ende_min = wandle_zeit_in_minuten_um(ende)
-    if ende_min <= start_min:
+    dauer_min = (wandle_zeit_in_minuten_um(ende)
+                 - wandle_zeit_in_minuten_um(start))
+    if dauer_min <= 0:
         return False
 
     # Pause zuerst als Text prüfen, damit "abc" oder "4.5" nicht
     # bei int() abstürzt
     if not ist_nur_ziffern(pause_text):
         return False
-    if int(pause_text) >= ende_min - start_min:
-        return False
-    return True
+    return int(pause_text) < dauer_min
+
+
+def wandle_zeile_in_eintrag_um(zeile, nummer, eintraege):
+    """Wandelt eine Zeile aus der Datei in einen Eintrag um.
+    Gibt None zurück (mit Meldung), wenn die Zeile kaputt ist oder es
+    das Datum schon gibt.
+    """
+    felder = zeile.split(";")
+    if not ist_gueltige_zeile(felder):
+        print(f"Zeile {nummer} übersprungen: {zeile}")
+        return None
+    if hat_eintrag_fuer_datum(eintraege, felder[0]):
+        print(f"Zeile {nummer} übersprungen: Datum doppelt")
+        return None
+    return {"datum": felder[0], "start": felder[1], "ende": felder[2],
+            "pause_min": int(felder[3])}
 
 
 def speichere_eintraege(eintraege, dateiname=STUNDEN_DATEI):
@@ -73,8 +71,8 @@ def speichere_eintraege(eintraege, dateiname=STUNDEN_DATEI):
 
 
 def lade_eintraege(dateiname=STUNDEN_DATEI):
-    """Liest die Einträge aus der Datei. Kaputte Zeilen werden übersprungen
-    und gemeldet.
+    """Liest die Einträge aus der Datei. Kaputte Zeilen werden
+    übersprungen und gemeldet.
     """
     eintraege = []
     zeilen = lese_zeilen_aus_datei(dateiname)
@@ -82,26 +80,12 @@ def lade_eintraege(dateiname=STUNDEN_DATEI):
     if zeilen is None:
         return eintraege
 
-    nummer = 0
-    for zeile in zeilen:
-        nummer += 1
-        # Zeilenumbruch am Ende entfernen
+    for nummer, zeile in enumerate(zeilen, 1):
         zeile = zeile.strip()
         # Leere Zeilen still überspringen (z. B. am Dateiende)
         if zeile == "":
             continue
-        felder = zeile.split(";")
-        if not ist_gueltige_zeile(felder):
-            print(f"Zeile {nummer} übersprungen: {zeile}")
-            continue
-        if hat_eintrag_fuer_datum(eintraege, felder[0]):
-            print(f"Zeile {nummer} übersprungen: Datum doppelt")
-            continue
-        eintrag = {
-            "datum": felder[0],
-            "start": felder[1],
-            "ende": felder[2],
-            "pause_min": int(felder[3]),
-        }
-        eintraege.append(eintrag)
+        eintrag = wandle_zeile_in_eintrag_um(zeile, nummer, eintraege)
+        if eintrag is not None:
+            eintraege.append(eintrag)
     return eintraege

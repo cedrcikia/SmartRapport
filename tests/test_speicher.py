@@ -56,4 +56,11 @@ TESTDATEI.write_bytes(b"05.10.2026;07:30;17:00;45\n"
 assert len(lade_eintraege(TESTDATEI)) == 2
 TESTDATEI.unlink()
 
+# Test 9: Datei mit BOM und Leerzeichen vor einer Zeile: beide Zeilen
+# werden geladen
+TESTDATEI.write_bytes(b"\xef\xbb\xbf05.10.2026;07:30;17:00;45\n"
+                      b"  06.10.2026;08:00;16:00;30\n")
+assert len(lade_eintraege(TESTDATEI)) == 2
+TESTDATEI.unlink()
+
 print("Alle Tests bestanden")
