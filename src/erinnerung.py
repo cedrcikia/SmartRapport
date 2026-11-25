@@ -4,8 +4,16 @@ from src.hilfen import baue_rapport_pfad, berechne_abgabetermin
 from src.pfade import DATEN_ORDNER
 
 # Index 0 = Januar, darum später heute.month - 1
-MONATSNAMEN = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-               "August", "September", "Oktober", "November", "Dezember"]
+MONATSNAMEN = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+               "Juli", "August", "September", "Oktober", "November",
+               "Dezember"]
+
+
+def baue_tage_text(tage):
+    """Einzahl bei 1, sonst Mehrzahl (auch "0 Tage")."""
+    if tage == 1:
+        return "noch 1 Tag"
+    return f"noch {tage} Tage"
 
 
 def baue_erinnerung_text(heute, rapport_ordner=DATEN_ORDNER):
@@ -26,13 +34,9 @@ def baue_erinnerung_text(heute, rapport_ordner=DATEN_ORDNER):
     if baue_rapport_pfad(monat, rapport_ordner).exists():
         return ""
 
-    # Einzahl bei 1, sonst Mehrzahl (auch "0 Tage")
-    if noch == 1:
-        tage_text = "noch 1 Tag"
-    else:
-        tage_text = f"noch {noch} Tage"
     name = MONATSNAMEN[heute.month - 1]
-    return f"Rapport {name} bis {termin} abgeben – {tage_text}"
+    return (f"Rapport {name} bis {termin} abgeben – "
+            f"{baue_tage_text(noch)}")
 
 
 def zeige_erinnerung(heute):
