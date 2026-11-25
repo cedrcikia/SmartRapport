@@ -61,6 +61,7 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 * **`eintraege`** ist die Liste aller Einträge, **`monats_eintraege`** die Einträge eines Monats, **`eintrag`** ein einzelner.
 * **`eingabe`** ist das, was die Person getippt hat.
 * Schlüssel in Dictionaries sind klein geschrieben (`"ahv"`, nicht `"AHV"`).
+* **Eingaben nur über `lies_eingabe`.** So werden Leerzeichen am Rand überall ignoriert.
 * **Dateizugriffe nur über `lese_zeilen_aus_datei` und `schreibe_zeilen_in_datei`.** Dort stehen die `try`/`except`-Blöcke (`FileNotFoundError`, `PermissionError`, `OSError`). So stürzt die App nicht ab, wenn eine Datei fehlt, gelöscht wird oder nicht beschreibbar ist.
 
 ---
@@ -117,14 +118,17 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 | `wandle_zeit_in_minuten_um(text)` | Zahl | `"07:30"` wird zu `450` |
 | `wandle_minuten_in_text_um(gesamt_min)` | Text | `525` wird zu `"8 Std 45 Min"` |
 | `berechne_arbeitszeit_min(eintrag)` | Zahl | Ende minus Start minus Pause |
-| `filtere_eintraege_nach_monat(eintraege, monat)` | Liste | Einträge dieses Monats, nach Datum sortiert |
+| `behalte_eintraege_des_monats(eintraege, monat)` | Liste | behält nur die Einträge dieses Monats |
+| `sortiere_eintraege_nach_datum(eintraege)` | Liste | sortiert die Einträge nach Datum (gleicher Monat) |
+| `filtere_eintraege_nach_monat(eintraege, monat)` | Liste | Einträge dieses Monats, nach Datum sortiert (ruft die zwei Funktionen darüber auf) |
 | `hat_eintrag_fuer_datum(eintraege, datum)` | `True`/`False` | gibt es für dieses Datum schon einen Eintrag |
 | `berechne_abgabetermin(monat)` | Text | `"10.2026"` wird zu `"31.10.2026"` (letzter Tag des Monats) |
 | `baue_rapport_dateiname(monat)` | Text | `"10.2026"` wird zu `"rapport_10_2026.txt"` |
 | `baue_rapport_pfad(monat, ordner)` | Pfad | voller Pfad des Rapports im Ordner `daten/` |
 | `lese_zeilen_aus_datei(pfad)` | Liste oder `None` | liest alle Zeilen einer Textdatei. Fehlt die Datei oder darf sie nicht gelesen werden, kommt `None` (mit `try`/`except`, kein Absturz). Kaputte Zeichen werden zu `?` |
 | `schreibe_zeilen_in_datei(pfad, zeilen)` | `True`/`False` | schreibt die Zeilen in die Datei und legt einen fehlenden Ordner an. Bei einem Fehler (z.B. schreibgeschützt) kommt eine Meldung und `False` (mit `try`/`except`, kein Absturz) |
-| `frage_ja_nein(frage)` | `True`/`False` | fragt `j/n`, bis die Eingabe stimmt |
+| `frage_ja_nein(frage)` | `True`/`False` | fragt `j/n`, bis die Eingabe stimmt (`J` und `N` gelten auch) |
+| `lies_eingabe(frage)` | Text | fragt mit `input()` und entfernt Leerzeichen am Rand. Alle Fragen der App nutzen sie |
 | `frage_monat()` | Text | fragt den Monat, bis er gültig ist |
 
 ### `src/einstellungen.py` (Person A)
@@ -132,8 +136,11 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 | Funktion | Zweck |
 |---|---|
 | `lade_einstellungen(dateiname)` | liest `einstellungen.txt` (mit `lese_zeilen_aus_datei`), legt sie mit Standardwerten an, falls sie fehlt. Gibt das Einstellungs-Dictionary zurück |
+| `uebernimm_zeile(einstellungen, zeile)` | übernimmt eine Zeile `schluessel=wert`, kaputte Zeilen werden übersprungen |
 | `speichere_einstellungen(einstellungen, dateiname)` | schreibt `einstellungen.txt`. Gibt `True` zurück, wenn es geklappt hat |
 | `aendere_stundenlohn(einstellungen)` | US-01 |
+| `frage_sollzeit_stunden()` | US-02: fragt die Stunden pro Tag (1 bis 24) |
+| `frage_sollzeit_minuten(stunden)` | US-02: fragt die Minuten (0 bis 59) |
 | `aendere_sollzeit(einstellungen)` | US-02 |
 | `frage_prozent(frage)` | fragt einen Prozentwert von 0 bis 100 |
 | `aendere_zuschlag_und_abzuege(einstellungen)` | US-03 |
@@ -153,6 +160,7 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 | Funktion | Zweck |
 |---|---|
 | `baue_erinnerung_text(heute, rapport_ordner)` | gibt den Hinweis als Text zurück, oder `""`. So lässt sich jeder Tag testen |
+| `baue_tage_text(tage)` | `"noch 1 Tag"` oder `"noch 3 Tage"` |
 | `zeige_erinnerung(heute)` | US-09: zeigt den Hinweis oder nichts. `heute` ist ein `date`-Objekt |
 
 ### `src/speicher.py` (Person C)
@@ -160,6 +168,7 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 | Funktion | Zweck |
 |---|---|
 | `wandle_eintrag_in_zeile_um(eintrag)` | `{"datum": ...}` wird zu `"05.10.2026;07:30;17:00;45"` |
+| `wandle_zeile_in_eintrag_um(zeile, nummer, eintraege)` | wandelt eine Zeile in einen Eintrag um, oder `None` mit Meldung (kaputt oder Datum doppelt) |
 | `ist_gueltige_zeile(felder)` | prüft, ob die 4 Felder einer Zeile gültig sind (wie bei US-04 und US-05) |
 | `lade_eintraege(dateiname)` | US-06: liest `stunden.txt`, überspringt kaputte Zeilen und doppelte Daten mit Meldung. Fehlt die Datei, kommt eine leere Liste. Gibt die Liste der Einträge zurück |
 | `speichere_eintraege(eintraege, dateiname)` | schreibt die ganze Liste in `stunden.txt`. Gibt `True` zurück, wenn es geklappt hat, sonst `False` |
@@ -168,9 +177,11 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 
 | Funktion | Zweck |
 |---|---|
-| `zeige_liste(monats_eintraege)` | zeigt die Einträge nummeriert ab 1 mit Total |
+| `baue_eintragszeilen(monats_eintraege)` | eine Zeile pro Eintrag (ab 1 nummeriert) und am Schluss das Total. US-07, US-08 und US-12 nutzen sie, so sieht die Liste überall gleich aus |
+| `zeige_liste(monats_eintraege)` | gibt diese Zeilen aus |
 | `zeige_eintraege(eintraege)` | US-07: fragt den Monat ab und zeigt die Liste |
 | `waehle_eintrag(monats_eintraege)` | fragt die Nummer, bis sie gültig ist, und gibt den Eintrag zurück |
+| `frage_aendern_oder_loeschen()` | fragt `1` (ändern) oder `2` (löschen), bis die Wahl gültig ist |
 | `aendere_eintrag(eintraege, eintrag)` | US-08: neue Werte abfragen (mit `frage_eintrag`), speichern |
 | `loesche_eintrag(eintraege, eintrag)` | US-08: nach Rückfrage löschen, speichern |
 | `aendere_oder_loesche_eintrag(eintraege)` | US-08: Monat, Nummer und `1` ändern oder `2` löschen |
@@ -181,6 +192,7 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 |---|---|
 | `berechne_ueberstunden(monats_eintraege, soll_min)` | US-10: zählt pro Tag Normalstunden und Überstunden (in Minuten) und summiert sie über den Monat. Gibt `(normal_min, ueber_min)` zurück |
 | `berechne_monat(monats_eintraege, einstellungen)` | US-10 und Lohn: ruft `berechne_ueberstunden` auf und gibt das Ergebnis-Dictionary zurück |
+| `fuelle_links_auf(text, breite)`, `fuelle_rechts_auf(text, breite)` | füllen einen Text mit Leerzeichen auf feste Breite auf |
 | `baue_zeile(bezeichnung, wert)` | eine Zeile der Übersicht mit fester Spaltenbreite |
 | `baue_uebersicht_zeilen(ergebnis, einstellungen)` | US-11 und US-12: baut die Zeilen der Lohnübersicht als Liste. So sind die Beträge in der Übersicht und im Rapport gleich |
 | `zeige_uebersicht(eintraege, einstellungen)` | US-11: fragt den Monat ab und zeigt die Übersicht |
@@ -189,13 +201,21 @@ Der Ordner `daten/` kommt nicht ins Git (siehe `.gitignore`). So landen die echt
 
 | Funktion | Zweck |
 |---|---|
-| `baue_eintragszeilen(monats_eintraege)` | US-12: eine Zeile pro Eintrag (ab 1 nummeriert, wie in US-07) und am Schluss das Total |
 | `baue_rapport(monat, monats_eintraege, einstellungen)` | US-12: setzt alle Zeilen des Rapports zusammen, ohne eine Datei zu schreiben |
 | `speichere_rapport(eintraege, einstellungen)` | US-12: fragt den Monat ab, fragt bei bestehender Datei nach und schreibt `rapport_MM_JJJJ.txt` in den Ordner `daten/` |
 
 ### `main.py` (Person B)
 
-Ablauf beim Start: `lege_daten_ordner_an()` → `lade_einstellungen()` → `lade_eintraege()` → `zeige_erinnerung(heute)` → Hauptmenü (Festlegung 8 im README).
+Ablauf beim Start: `lade_startdaten()` (ruft `lege_daten_ordner_an()`, `lade_einstellungen()`, `lade_eintraege()` und `zeige_erinnerung(heute)` auf) → Hauptmenü (Festlegung 8 im README). Strg+C und Strg+Z beenden die App ohne Fehlermeldung.
+
+| Funktion in `main.py` | Zweck |
+|---|---|
+| `zeige_hauptmenue()` | zeigt das Menü mit den Punkten 1 bis 9 |
+| `fuehre_eintragsfunktion_aus(wahl, eintraege, einstellungen)` | Menüpunkt 1 bis 5 |
+| `fuehre_einstellungsfunktion_aus(wahl, einstellungen)` | Menüpunkt 6 bis 8 |
+| `fuehre_menuepunkt_aus(wahl, eintraege, einstellungen)` | verteilt die Wahl, gibt bei `9` `False` zurück, sonst `True` |
+| `lade_startdaten()` | Ordner `daten/`, Einstellungen, Einträge, Erinnerung |
+| `starte_app()` | Menü-Schleife mit `try`/`except` für `KeyboardInterrupt` und `EOFError` |
 
 | Menüpunkt | Ruft auf | Von |
 |---|---|---|
@@ -219,7 +239,7 @@ Alle Tests liegen im Ordner `tests/` und werden im Hauptordner gestartet:
 python -m tests.alle_tests
 ```
 
-Ein einzelner Test, z.B. `python -m tests.test_berechnung`. Die Beispieldateien liegen in `tests/testdaten/` (`stunden_beispiel.txt` mit 3 gültigen Zeilen, `stunden_fehler.txt` mit einer kaputten Zeile und einem doppelten Datum). Mit `stunden_beispiel.txt` ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15 Std 30 Min normal, 0 Std 45 Min Überstunden, Brutto CHF 534.22, AHV CHF 28.31, ALV CHF 5.88, NBU CHF 19.98, Netto CHF 480.05.
+Ein einzelner Test, z.B. `python -m tests.test_berechnung`. Es gibt Tests für Hilfen, Berechnung, Speicher, Einstellungen, Erinnerung, Rapport und Hauptmenü. Die Beispieldateien liegen in `tests/testdaten/` (`stunden_beispiel.txt` mit 3 gültigen Zeilen, `stunden_fehler.txt` mit einer kaputten Zeile und einem doppelten Datum). Mit `stunden_beispiel.txt` ist das erwartete Ergebnis für den Monat `10.2026` bekannt: 15 Std 30 Min normal, 0 Std 45 Min Überstunden, Brutto CHF 534.22, AHV CHF 28.31, ALV CHF 5.88, NBU CHF 19.98, Netto CHF 480.05.
 
 ---
 ## Zeitplan (an das Semesterprogramm angepasst)
