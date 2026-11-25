@@ -35,7 +35,7 @@ def baue_erinnerung_text(heute, rapport_ordner=DATEN_ORDNER):
         return ""
 
     name = MONATSNAMEN[heute.month - 1]
-    return (f"Rapport {name} bis {termin} abgeben – "
+    return (f"Rapport {name} bis {termin} abgeben - "
             f"{baue_tage_text(noch)}")
 
 

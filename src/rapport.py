@@ -14,7 +14,7 @@ def baue_rapport(monat, monats_eintraege, einstellungen):
     """Setzt alle Zeilen des Rapports zusammen, noch ohne Datei."""
     ergebnis = berechne_monat(monats_eintraege, einstellungen)
     trennlinie = "-" * TRENNLINIE_LAENGE
-    zeilen = [f"SMARTRAPPORT – RAPPORT {monat}",
+    zeilen = [f"SMARTRAPPORT - RAPPORT {monat}",
               f"Abgabetermin: {berechne_abgabetermin(monat)}",
               trennlinie]
     zeilen += baue_eintragszeilen(monats_eintraege)
@@ -29,7 +29,7 @@ def speichere_rapport(eintraege, einstellungen):
     monats_eintraege = filtere_eintraege_nach_monat(eintraege, monat)
     # Ohne Einträge gibt es keinen Rapport
     if len(monats_eintraege) == 0:
-        print("Keine Einträge – Rapport nicht erstellt.")
+        print("Keine Einträge - Rapport nicht erstellt.")
         return
     pfad = baue_rapport_pfad(monat)
     # Bestehende Datei nur nach Rückfrage überschreiben

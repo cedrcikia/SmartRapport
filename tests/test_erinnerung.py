@@ -11,13 +11,13 @@ ORDNER = Path(__file__).resolve().parent / "testdaten"
 
 # Erinnerung in den letzten 4 Tagen des Monats
 assert baue_erinnerung_text(date(2026, 10, 28), ORDNER) == \
-    "Rapport Oktober bis 31.10.2026 abgeben – noch 3 Tage"
+    "Rapport Oktober bis 31.10.2026 abgeben - noch 3 Tage"
 assert baue_erinnerung_text(date(2026, 10, 30), ORDNER).endswith("noch 1 Tag")
 assert baue_erinnerung_text(date(2026, 10, 31), ORDNER).endswith("noch 0 Tage")
 
 # Februar hat 28 Tage
 assert baue_erinnerung_text(date(2026, 2, 25), ORDNER) == \
-    "Rapport Februar bis 28.02.2026 abgeben – noch 3 Tage"
+    "Rapport Februar bis 28.02.2026 abgeben - noch 3 Tage"
 
 # Vorher und nachher keine Erinnerung
 assert baue_erinnerung_text(date(2026, 10, 27), ORDNER) == ""

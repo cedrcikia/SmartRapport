@@ -22,7 +22,7 @@ def baue_eintragszeilen(monats_eintraege):
         arbeits_min = berechne_arbeitszeit_min(eintrag)
         total_min += arbeits_min
         zeilen.append(f"{nummer}. {eintrag['datum']}  "
-                      f"{eintrag['start']}–{eintrag['ende']}  "
+                      f"{eintrag['start']}-{eintrag['ende']}  "
                       f"Pause {eintrag['pause_min']} Min  "
                       f"{wandle_minuten_in_text_um(arbeits_min)}")
     zeilen.append(f"Total: {wandle_minuten_in_text_um(total_min)}")

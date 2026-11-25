@@ -1,4 +1,4 @@
-# SmartRapport – Teamplan (intern)
+# SmartRapport - Teamplan (intern)
 
 Interne Arbeitsgrundlage für das Team. Gehört nicht zur Abgabe der User Stories. Fachliche Regeln und Stories stehen im `README.md`.
 

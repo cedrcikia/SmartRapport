@@ -1,4 +1,4 @@
-# ⏱️ SmartRapport – Arbeitszeit-App für Temporäre (Konsole)
+# SmartRapport - Arbeitszeit-App für Temporäre (Konsole)
 
 Gruppenprojekt im Modul **Grundlagen Programmieren**, FHNW, Herbstsemester 2026.
 
@@ -57,7 +57,7 @@ Die Konsole bedient immer der Temporäre. Die Lohnbuchhaltung hat Anforderungen 
 
 ---
 
-## 📖 User Stories
+## User Stories
 
 Jede Person im Team ist für 3 User Stories zuständig (siehe Aufgabenverteilung).
 
@@ -148,7 +148,7 @@ Als **Temporärer** möchte ich alle Einträge eines Monats sehen, damit ich wei
 
 **Akzeptanzkriterien**
 * Der Monat wird als `MM.JJJJ` eingegeben (z.B. `10.2026`).
-* Die Einträge dieses Monats werden nach Datum sortiert und ab 1 nummeriert angezeigt, z.B. `1. 05.10.2026  07:30–17:00  Pause 45 Min  8 Std 45 Min`.
+* Die Einträge dieses Monats werden nach Datum sortiert und ab 1 nummeriert angezeigt, z.B. `1. 05.10.2026  07:30-17:00  Pause 45 Min  8 Std 45 Min`.
 * Unter der Liste steht das Total der Arbeitszeit des Monats.
 * Gegeben Einträge am 05.10.2026 (8 Std 45 Min), 06.10.2026 (7 Std 30 Min) und 12.11.2026, wenn `10.2026` gewählt wird, dann werden 2 Einträge als 1 und 2 angezeigt und das Total ist `16 Std 15 Min`.
 * Gegeben es gibt keine Einträge in diesem Monat, dann erscheint `Keine Einträge für 10.2026.`
@@ -176,10 +176,10 @@ Als **Temporärer** möchte ich beim Starten der App an den Abgabetermin erinner
 
 **Akzeptanzkriterien**
 * Der Abgabetermin ist der letzte Tag des Monats (siehe Festlegung 6). Die Erinnerung erscheint beim Start in den letzten 4 Tagen des Monats (3 Tage vorher bis und mit Abgabetag), und nur wenn die Datei `rapport_MM_JJJJ.txt` für diesen Monat noch nicht existiert.
-* Gegeben das heutige Datum ist `28.10.2026` und `rapport_10_2026.txt` existiert nicht, dann erscheint `Rapport Oktober bis 31.10.2026 abgeben – noch 3 Tage`.
-* Gegeben das heutige Datum ist `30.10.2026`, dann lautet der Hinweis `... – noch 1 Tag`.
-* Gegeben das heutige Datum ist `31.10.2026`, dann lautet der Hinweis `... – noch 0 Tage`.
-* Gegeben das heutige Datum ist `25.02.2026` und `rapport_02_2026.txt` existiert nicht, dann erscheint `Rapport Februar bis 28.02.2026 abgeben – noch 3 Tage`.
+* Gegeben das heutige Datum ist `28.10.2026` und `rapport_10_2026.txt` existiert nicht, dann erscheint `Rapport Oktober bis 31.10.2026 abgeben - noch 3 Tage`.
+* Gegeben das heutige Datum ist `30.10.2026`, dann lautet der Hinweis `... - noch 1 Tag`.
+* Gegeben das heutige Datum ist `31.10.2026`, dann lautet der Hinweis `... - noch 0 Tage`.
+* Gegeben das heutige Datum ist `25.02.2026` und `rapport_02_2026.txt` existiert nicht, dann erscheint `Rapport Februar bis 28.02.2026 abgeben - noch 3 Tage`.
 * Gegeben das heutige Datum ist `27.10.2026` oder `01.11.2026`, dann erscheint keine Erinnerung für Oktober.
 * Gegeben das heutige Datum ist `28.10.2026` und `rapport_10_2026.txt` existiert, dann erscheint keine Erinnerung.
 
@@ -228,11 +228,11 @@ Als **Lohnbuchhaltung** möchte ich vom Temporären einen Rapport als Textdatei 
 * Die Datei enthält den Monat, den Abgabetermin (`Abgabetermin: 31.10.2026`), alle Einträge (wie in US-07) und die Lohnübersicht (wie in US-11). Die Beträge sind identisch mit denen der Übersicht. Beispiel:
 
 ```
-SMARTRAPPORT – RAPPORT 10.2026
+SMARTRAPPORT - RAPPORT 10.2026
 Abgabetermin: 31.10.2026
 ----------------------------------------
-1. 05.10.2026  07:30–17:00  Pause 45 Min  8 Std 45 Min
-2. 06.10.2026  08:00–16:00  Pause 30 Min  7 Std 30 Min
+1. 05.10.2026  07:30-17:00  Pause 45 Min  8 Std 45 Min
+2. 06.10.2026  08:00-16:00  Pause 30 Min  7 Std 30 Min
 Total: 16 Std 15 Min
 ----------------------------------------
 Normalstunden:     15 Std 30 Min
@@ -246,11 +246,129 @@ Netto:             CHF 480.05
 
 * Gegeben der Monat `10.2026` mit Einträgen, wenn der Rapport gespeichert wird, dann erscheint `Rapport gespeichert als rapport_10_2026.txt` und die Datei existiert.
 * Gegeben `rapport_10_2026.txt` existiert schon, dann fragt die App `Datei existiert bereits. Überschreiben? (j/n)`. Bei `j` wird sie überschrieben. Bei `n` bleibt sie unverändert und es erscheint `Rapport nicht gespeichert.`
-* Gegeben der Monat hat keine Einträge, dann erscheint `Keine Einträge – Rapport nicht erstellt.` und es wird keine Datei angelegt.
+* Gegeben der Monat hat keine Einträge, dann erscheint `Keine Einträge - Rapport nicht erstellt.` und es wird keine Datei angelegt.
 
 ---
 
-## 👥 Aufgabenverteilung
+## Project Requirements
+
+Jede App muss drei Kriterien erfüllen, damit sie akzeptiert wird (Projektrichtlinien, Kapitel 2). SmartRapport erfüllt alle drei:
+
+| Kriterium | Wo in der App | Stories |
+|---|---|---|
+| **Interaktive App** (Eingabe über die Konsole) | Hauptmenü und Fragen mit `input()` | alle |
+| **Datenvalidierung** (Eingaben prüfen) | Prüffunktionen in `src/hilfen.py`, Fragen in `src/erfassung.py`, `src/einstellungen.py`, `src/verwaltung.py` | US-01 bis US-08 |
+| **Dateiverarbeitung** (Lesen und Schreiben) | `stunden.txt`, `einstellungen.txt` und der Rapport im Ordner `daten/` | US-01 bis US-03, US-06, US-12 |
+
+### 1. Interaktive App (Konsole)
+
+Die App läuft in einer Schleife. Sie zeigt das Hauptmenü, fragt die Nummer eines Menüpunkts ab, führt ihn aus und zeigt das Menü wieder (`starte_app` in `main.py`). Alle Eingaben laufen über `lies_eingabe`, die Leerzeichen am Rand entfernt. Mit `9` beendet man die App. Strg+C und Strg+Z (Eingabe-Ende) beenden sie ebenfalls ohne Fehlermeldung.
+
+Ein Arbeitstag wird so eingetragen:
+
+```
+Deine Wahl: 1
+Datum (TT.MM.JJJJ): 05.10.2026
+Start (HH:MM): 07:30
+Ende (HH:MM): 17:00
+Pause in Minuten: 45
+Arbeitszeit: 8 Std 45 Min
+Eintrag gespeichert
+```
+
+Die Person kann ausserdem Einträge anzeigen, ändern und löschen, ihre Einstellungen ändern, sich die Übersicht mit Lohn anzeigen lassen und den Rapport speichern.
+
+### 2. Datenvalidierung
+
+Jede Eingabe wird geprüft, bevor sie verwendet wird. Bei einem Fehler zeigt die App eine Meldung und fragt dieselbe Eingabe nochmals ab, das Programm stürzt nicht ab. Das Muster ist immer gleich: eine `while`-Schleife, die erst endet, wenn die Eingabe gültig ist. Erst danach wird mit `int()` oder `float()` umgewandelt.
+
+| Eingabe | Prüfung | Funktion | Meldung |
+|---|---|---|---|
+| Menüwahl | nur `1` bis `9` | `fuehre_menuepunkt_aus` | `Ungültige Wahl.` |
+| Datum | Format `TT.MM.JJJJ`, das Datum existiert (`31.02.` ist ungültig), noch kein Eintrag | `ist_gueltiges_datum`, `hat_eintrag_fuer_datum` in `frage_datum` | `Ungültiges Datum (TT.MM.JJJJ).` |
+| Uhrzeit | Format `HH:MM`, `00:00` bis `23:59` | `ist_gueltige_uhrzeit` in `frage_uhrzeit` | `Ungültige Uhrzeit (HH:MM).` |
+| Ende | muss nach dem Start liegen | `frage_eintrag` | `Das Ende muss nach dem Start liegen.` |
+| Pause | ganze Zahl, kürzer als die Arbeitszeit | `ist_nur_ziffern` in `frage_pause` | `Ungültige Pause.` |
+| Monat | Format `MM.JJJJ`, Monat `01` bis `12` | `ist_gueltiger_monat` in `frage_monat` | `Ungültiger Monat (MM.JJJJ).` |
+| Stundenlohn | Zahl grösser 0, nur Punkt als Dezimaltrennzeichen | `ist_dezimalzahl` in `aendere_stundenlohn` | `Ungültiger Stundenlohn.` |
+| Sollzeit | Stunden `1` bis `24`, Minuten `0` bis `59` | `frage_sollzeit_stunden`, `frage_sollzeit_minuten` | `Ungültige Eingabe.` |
+| Zuschlag und Abzüge | Zahl von `0` bis `100` | `frage_prozent` | `Ungültiger Prozentwert (0 bis 100).` |
+| Nummer eines Eintrags | kommt in der Liste vor | `waehle_eintrag` | `Ungültige Nummer.` |
+| Ändern oder löschen | `1` oder `2` | `frage_aendern_oder_loeschen` | `Ungültige Wahl.` |
+| Ja oder Nein | `j` oder `n` (auch `J` und `N`) | `frage_ja_nein` | `Bitte j oder n eingeben.` |
+| Zeilen in `stunden.txt` | 4 Felder, gleiche Prüfungen wie beim Eintragen, Datum nicht doppelt | `ist_gueltige_zeile` | `Zeile 2 übersprungen: ...` |
+
+So sieht die Prüfung der Pause aus (`src/erfassung.py`):
+
+```python
+def frage_pause(max_min):
+    while True:
+        eingabe = lies_eingabe("Pause in Minuten: ")
+        if not ist_nur_ziffern(eingabe):
+            print("Ungültige Pause.")
+        elif int(eingabe) >= max_min:
+            print("Die Pause muss kürzer sein als die Zeit zwischen "
+                  "Start und Ende.")
+        else:
+            return int(eingabe)
+```
+
+Die Eingabe wird zuerst als Text geprüft (`ist_nur_ziffern`). So führen `abc`, `4.5`, `-5` oder eine leere Eingabe nicht zu einem Absturz bei `int()`.
+
+### 3. Dateiverarbeitung
+
+Die App liest und schreibt drei Arten von Textdateien im Ordner `daten/`:
+
+| Datei | Richtung | Inhalt | Beispiel |
+|---|---|---|---|
+| `stunden.txt` | lesen beim Start, schreiben nach jeder Änderung | alle Einträge, eine Zeile pro Tag | `05.10.2026;07:30;17:00;45` |
+| `einstellungen.txt` | lesen beim Start, schreiben nach jeder Änderung | Stundenlohn, Sollzeit, Zuschlag, Abzüge | `stundenlohn=32.50` |
+| `rapport_MM_JJJJ.txt` | schreiben | Rapport eines Monats mit Einträgen und Lohnübersicht | `rapport_10_2026.txt` |
+
+Der Rapport sieht so aus:
+
+```
+SMARTRAPPORT - RAPPORT 10.2026
+Abgabetermin: 31.10.2026
+----------------------------------------
+1. 05.10.2026  07:30-17:00  Pause 45 Min  8 Std 45 Min
+2. 06.10.2026  08:00-16:00  Pause 30 Min  7 Std 30 Min
+Total: 16 Std 15 Min
+----------------------------------------
+Normalstunden:     15 Std 30 Min
+Überstunden:        0 Std 45 Min
+Brutto:            CHF 534.22
+AHV (5.30 %):      -CHF 28.31
+ALV (1.10 %):      -CHF 5.88
+NBU (3.74 %):      -CHF 19.98
+Netto:             CHF 480.05
+```
+
+Der Zugriff auf Dateien steckt an genau zwei Stellen in `src/hilfen.py` (`lese_zeilen_aus_datei` und `schreibe_zeilen_in_datei`). Dort fängt ein `try`/`except` mit konkreten Fehlern ab, was schiefgehen kann:
+
+```python
+try:
+    with open(pfad, "r", encoding="utf-8-sig", errors="replace") as datei:
+        ...
+except FileNotFoundError:
+    return None
+except PermissionError:
+    print(f"Datei kann nicht gelesen werden: {Path(pfad).name}")
+    return None
+```
+
+| Was schiefgeht | Was die App macht |
+|---|---|
+| `stunden.txt` fehlt oder wurde gelöscht | startet mit einer leeren Liste, die Datei wird beim nächsten Speichern neu angelegt |
+| `einstellungen.txt` fehlt | die Standardwerte gelten und die Datei wird neu angelegt |
+| Der Ordner `daten/` fehlt | er wird beim Start und beim Speichern neu angelegt |
+| Die Datei ist schreibgeschützt | die App zeigt `Speichern nicht möglich (...)` und läuft weiter |
+| Eine Zeile ist kaputt oder das Datum doppelt | die Zeile wird mit `Zeile 2 übersprungen: ...` gemeldet, die anderen werden geladen |
+| Kaputte Zeichen oder ein BOM am Dateianfang | kaputte Zeichen machen nur die Zeile ungültig, ein BOM wird entfernt |
+
+---
+
+## Aufgabenverteilung
 
 | Person | Name | Stories | Eigene Dateien |
 |---|---|---|---|
@@ -267,7 +385,7 @@ Netto:             CHF 480.05
 
 ---
 
-## ⚙️ Implementation
+## Implementation
 
 ### Technologie
 * Python 3.x, nur die Standardbibliothek (`os`, `pathlib`, `datetime`). Keine externen Bibliotheken.
@@ -293,6 +411,76 @@ SmartRapport/
 ├── daten/                  # wird von der App angelegt: stunden.txt, einstellungen.txt, Rapporte
 └── docs/teamplan.md        # interner Teamplan
 ```
+
+### Ablaufskizze
+
+So läuft die App ab, von oben nach unten:
+
+```
+Start
+  → lade_startdaten()                 Ordner daten/, Einstellungen, Einträge laden, Erinnerung
+  → Menü-Schleife:
+        zeige_hauptmenue()            Output
+        lies_eingabe()                Input
+        fuehre_menuepunkt_aus()       1 bis 8: Menüpunkt ausführen, danach wieder das Menü
+                                      9: "Auf Wiedersehen!" → Schleife endet
+  → Ende
+```
+
+Strg+C oder Strg+Z beenden die Schleife ebenfalls (`try`/`except` in `starte_app`). Gespeichert wird schon bei jeder Änderung, es geht nichts verloren.
+
+### Funktionsbaum
+
+Wer welche Funktion aufruft (die Datei steht rechts):
+
+```
+starte_app()                                                   main.py
+├── lade_startdaten()
+│   ├── lege_daten_ordner_an()                                 pfade.py
+│   ├── lade_einstellungen()                                   einstellungen.py
+│   │   ├── lese_zeilen_aus_datei()                            hilfen.py
+│   │   └── uebernimm_zeile()
+│   ├── lade_eintraege()                                       speicher.py
+│   │   ├── lese_zeilen_aus_datei()
+│   │   └── wandle_zeile_in_eintrag_um() → ist_gueltige_zeile()
+│   └── zeige_erinnerung()                                     erinnerung.py
+│       └── baue_erinnerung_text() → berechne_abgabetermin(), baue_tage_text()
+└── Menü-Schleife → fuehre_menuepunkt_aus()
+    ├── 1  trage_arbeitstag_ein()                              erfassung.py
+    │      ├── frage_eintrag() → frage_datum(), frage_uhrzeit(), frage_pause()
+    │      ├── berechne_arbeitszeit_min()                      hilfen.py
+    │      └── speichere_eintraege()                           speicher.py
+    │          └── schreibe_zeilen_in_datei()                  hilfen.py
+    ├── 2  zeige_eintraege()                                   verwaltung.py
+    │      ├── frage_monat(), filtere_eintraege_nach_monat()   hilfen.py
+    │      └── zeige_liste() → baue_eintragszeilen()
+    ├── 3  aendere_oder_loesche_eintrag()                      verwaltung.py
+    │      ├── waehle_eintrag(), frage_aendern_oder_loeschen()
+    │      ├── aendere_eintrag() → frage_eintrag(), speichere_eintraege()
+    │      └── loesche_eintrag() → frage_ja_nein(), speichere_eintraege()
+    ├── 4  zeige_uebersicht()                                  berechnung.py
+    │      ├── berechne_monat() → berechne_ueberstunden()
+    │      └── baue_uebersicht_zeilen()
+    ├── 5  speichere_rapport()                                 rapport.py
+    │      ├── baue_rapport() → berechne_monat(), baue_eintragszeilen(),
+    │      │                    baue_uebersicht_zeilen()
+    │      └── schreibe_zeilen_in_datei()                      hilfen.py
+    ├── 6  aendere_stundenlohn()                               einstellungen.py
+    ├── 7  aendere_sollzeit()
+    ├── 8  aendere_zuschlag_und_abzuege()
+    └── 9  Beenden
+```
+
+### Input, Processing, Output
+
+Jede Funktion gehört zu einer der drei Gruppen (Empfehlung für das Programmdesign). Die Funktionen für die Verarbeitung (Processing) geben nur ein Ergebnis zurück. Sie lesen nichts ein, zeigen nichts an und schreiben keine Dateien, deshalb lassen sie sich einfach testen (siehe `tests/`).
+
+| Gruppe | Aufgabe | Funktionen (Beispiele) |
+|---|---|---|
+| **Input** | Eingaben und Dateien lesen | `lies_eingabe`, `frage_datum`, `frage_uhrzeit`, `frage_pause`, `frage_monat`, `frage_ja_nein`, `frage_prozent`, `waehle_eintrag`, `lese_zeilen_aus_datei`, `lade_einstellungen`, `lade_eintraege` |
+| **Processing** | prüfen, umwandeln, rechnen | `ist_gueltiges_datum`, `ist_gueltige_uhrzeit`, `ist_nur_ziffern`, `ist_dezimalzahl`, `wandle_zeit_in_minuten_um`, `wandle_minuten_in_text_um`, `berechne_arbeitszeit_min`, `berechne_ueberstunden`, `berechne_monat`, `berechne_abgabetermin`, `filtere_eintraege_nach_monat`, `baue_uebersicht_zeilen`, `baue_eintragszeilen`, `baue_rapport` |
+| **Output** | anzeigen und speichern | `zeige_hauptmenue`, `zeige_eintraege`, `zeige_liste`, `zeige_uebersicht`, `zeige_erinnerung`, `speichere_eintraege`, `speichere_einstellungen`, `speichere_rapport`, `schreibe_zeilen_in_datei` |
+| **Ablauf** | Input, Processing und Output verbinden | `starte_app`, `fuehre_menuepunkt_aus`, `trage_arbeitstag_ein`, `aendere_eintrag`, `loesche_eintrag`, `aendere_stundenlohn` |
 
 ### Starten
 Im Hauptordner des Projekts:
