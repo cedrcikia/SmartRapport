@@ -1,24 +1,27 @@
-# berechnung.py · Person D · Überstunden und Lohn eines Monats (US-10, US-11)
+# berechnung.py · Person D · Überstunden und Lohn eines Monats
+# (US-10, US-11)
 
-from src.hilfen import (berechne_arbeitszeit_min, filtere_eintraege_nach_monat,
-                        frage_monat, wandle_minuten_in_text_um)
+from src.hilfen import (berechne_arbeitszeit_min,
+                        filtere_eintraege_nach_monat, frage_monat,
+                        wandle_minuten_in_text_um)
 
-# Spaltenbreiten der Übersicht: "Normalstunden:" ist die längste Bezeichnung,
-# "15 Std 30 Min" der längste Stundenwert
+# Spaltenbreiten der Übersicht: "Normalstunden:" ist die längste
+# Bezeichnung (14 Zeichen plus Abstand), "15 Std 30 Min" der längste
+# Stundenwert
 BEZEICHNUNG_BREITE = 19
 STUNDEN_BREITE = 13
 
 
 def berechne_ueberstunden(monats_eintraege, soll_min):
-    """US-10: Zählt pro Tag Normalstunden und Überstunden (in Minuten)
-    und summiert sie über den Monat.
+    """US-10: Zählt pro Tag Normalstunden und Überstunden (Minuten) und
+    summiert sie über den Monat. Gibt (normal_min, ueber_min) zurück.
     """
     # Beide Summen starten bei 0, bei einem leeren Monat bleibt es dabei
     normal_min = 0
     ueber_min = 0
     for eintrag in monats_eintraege:
         arbeits_min = berechne_arbeitszeit_min(eintrag)
-        # Normal ist höchstens die Sollzeit, der Rest eines Tages ist Überzeit
+        # Normal ist höchstens die Sollzeit, der Rest ist Überzeit
         normal_min += min(arbeits_min, soll_min)
         # Bei weniger als der Sollzeit wäre die Differenz negativ,
         # darum max(0, ...): dann gibt es 0 Überstunden
@@ -27,13 +30,13 @@ def berechne_ueberstunden(monats_eintraege, soll_min):
 
 
 def berechne_monat(monats_eintraege, einstellungen):
-    """Berechnet Stunden, Bruttolohn, Abzüge und Nettolohn eines Monats."""
+    """Berechnet Stunden, Brutto, Abzüge und Netto eines Monats."""
     normal_min, ueber_min = berechne_ueberstunden(
         monats_eintraege, einstellungen["soll_min"])
     normal_lohn = normal_min / 60 * einstellungen["stundenlohn"]
     ueber_lohn = (ueber_min / 60 * einstellungen["stundenlohn"]
                   * (1 + einstellungen["zuschlag"] / 100))
-    # Zuerst Brutto auf 2 Stellen runden, die Abzüge rechnen dann damit
+    # Zuerst Brutto auf 2 Stellen runden, die Abzüge rechnen damit
     brutto = round(normal_lohn + ueber_lohn, 2)
     abzuege = {}
     for name in ("ahv", "alv", "nbu"):
@@ -43,9 +46,19 @@ def berechne_monat(monats_eintraege, einstellungen):
             "brutto": brutto, "abzuege": abzuege, "netto": netto}
 
 
+def fuelle_links_auf(text, breite):
+    """Hängt Leerzeichen an, bis der Text die Breite hat."""
+    return text + " " * (breite - len(text))
+
+
+def fuelle_rechts_auf(text, breite):
+    """Setzt Leerzeichen davor, bis der Text die Breite hat."""
+    return " " * (breite - len(text)) + text
+
+
 def baue_zeile(bezeichnung, wert):
-    """Eine Zeile der Übersicht: Bezeichnung links, Wert rechts davon."""
-    return bezeichnung.ljust(BEZEICHNUNG_BREITE) + wert
+    """Eine Zeile der Übersicht: Bezeichnung links, dann der Wert."""
+    return fuelle_links_auf(bezeichnung, BEZEICHNUNG_BREITE) + wert
 
 
 def baue_uebersicht_zeilen(ergebnis, einstellungen):
@@ -55,15 +68,14 @@ def baue_uebersicht_zeilen(ergebnis, einstellungen):
     normal_text = wandle_minuten_in_text_um(ergebnis["normal_min"])
     ueber_text = wandle_minuten_in_text_um(ergebnis["ueber_min"])
     zeilen = []
-    zeilen.append(baue_zeile("Normalstunden:",
-                             normal_text.rjust(STUNDEN_BREITE)))
-    zeilen.append(baue_zeile("Überstunden:",
-                             ueber_text.rjust(STUNDEN_BREITE)))
+    zeilen.append(baue_zeile(
+        "Normalstunden:", fuelle_rechts_auf(normal_text, STUNDEN_BREITE)))
+    zeilen.append(baue_zeile(
+        "Überstunden:", fuelle_rechts_auf(ueber_text, STUNDEN_BREITE)))
     zeilen.append(baue_zeile("Brutto:", f"CHF {ergebnis['brutto']:.2f}"))
     # Der Prozentsatz im Text kommt aus den Einstellungen, nicht fest
     for name in ("ahv", "alv", "nbu"):
-        satz = einstellungen[name]
-        bezeichnung = f"{name.upper()} ({satz:.2f} %):"
+        bezeichnung = f"{name.upper()} ({einstellungen[name]:.2f} %):"
         betrag = ergebnis["abzuege"][name]
         zeilen.append(baue_zeile(bezeichnung, f"-CHF {betrag:.2f}"))
     zeilen.append(baue_zeile("Netto:", f"CHF {ergebnis['netto']:.2f}"))
@@ -71,7 +83,7 @@ def baue_uebersicht_zeilen(ergebnis, einstellungen):
 
 
 def zeige_uebersicht(eintraege, einstellungen):
-    """US-11: Fragt den Monat ab und zeigt Stunden, Lohn und Abzüge."""
+    """US-11: Fragt den Monat und zeigt Stunden, Lohn und Abzüge."""
     monat = frage_monat()
     monats_eintraege = filtere_eintraege_nach_monat(eintraege, monat)
     # Ohne Einträge gibt es nichts zu rechnen, also gleich beenden
