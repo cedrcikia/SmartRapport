@@ -2,15 +2,16 @@
 
 from src.hilfen import (berechne_arbeitszeit_min, hat_eintrag_fuer_datum,
                         ist_gueltige_uhrzeit, ist_gueltiges_datum,
-                        ist_nur_ziffern, wandle_minuten_in_text_um,
+                        ist_nur_ziffern, lies_eingabe,
+                        wandle_minuten_in_text_um,
                         wandle_zeit_in_minuten_um)
 from src.speicher import speichere_eintraege
 
 
 def frage_datum(eintraege):
-    """US-04: fragt ein Datum ab, bis es gültig ist und noch frei ist."""
+    """US-04: fragt ein Datum, bis es gültig ist und noch frei ist."""
     while True:
-        datum = input("Datum (TT.MM.JJJJ): ")
+        datum = lies_eingabe("Datum (TT.MM.JJJJ): ")
         if not ist_gueltiges_datum(datum):
             print("Ungültiges Datum (TT.MM.JJJJ).")
         elif hat_eintrag_fuer_datum(eintraege, datum):
@@ -21,18 +22,18 @@ def frage_datum(eintraege):
 
 
 def frage_uhrzeit(frage):
-    """US-04: fragt eine Uhrzeit mit dem Fragetext ab, bis sie gültig ist."""
+    """US-04: fragt eine Uhrzeit, bis sie gültig ist."""
     while True:
-        uhrzeit = input(frage)
+        uhrzeit = lies_eingabe(frage)
         if ist_gueltige_uhrzeit(uhrzeit):
             return uhrzeit
         print("Ungültige Uhrzeit (HH:MM).")
 
 
 def frage_pause(max_min):
-    """US-05: fragt die Pause ab, bis sie gültig und kürzer als max_min ist."""
+    """US-05: fragt die Pause, sie muss kürzer als max_min sein."""
     while True:
-        eingabe = input("Pause in Minuten: ")
+        eingabe = lies_eingabe("Pause in Minuten: ")
         # nur ganze Zahlen erlaubt: leer, -5, 4.5 und abc fallen weg
         if not ist_nur_ziffern(eingabe):
             print("Ungültige Pause.")
@@ -40,19 +41,19 @@ def frage_pause(max_min):
             print("Die Pause muss kürzer sein als die Zeit zwischen "
                   "Start und Ende.")
         else:
-            # int() erst hier: ungültige Eingaben kommen gar nicht so weit
+            # int() erst hier: ungültige Eingaben kommen nicht so weit
             return int(eingabe)
 
 
 def frage_eintrag(eintraege):
-    """US-04 und US-05: fragt Datum, Start, Ende und Pause ab und gibt
-    den neuen Eintrag zurück. Wird auch beim Ändern (US-08) gebraucht.
+    """US-04 und US-05: fragt Datum, Start, Ende und Pause und gibt den
+    neuen Eintrag zurück. Wird auch beim Ändern (US-08) gebraucht.
     """
     datum = frage_datum(eintraege)
     start = frage_uhrzeit("Start (HH:MM): ")
     ende = frage_uhrzeit("Ende (HH:MM): ")
 
-    # Ende muss am selben Tag nach dem Start liegen, sonst nur Ende neu fragen
+    # Ende muss am selben Tag nach dem Start liegen, sonst nur Ende neu
     start_min = wandle_zeit_in_minuten_um(start)
     while wandle_zeit_in_minuten_um(ende) <= start_min:
         print("Das Ende muss nach dem Start liegen.")
@@ -63,11 +64,12 @@ def frage_eintrag(eintraege):
     pause = frage_pause(max_min)
 
     # Eintrag als Dictionary (pause_min ist int, der Rest Text)
-    return {"datum": datum, "start": start, "ende": ende, "pause_min": pause}
+    return {"datum": datum, "start": start, "ende": ende,
+            "pause_min": pause}
 
 
 def trage_arbeitstag_ein(eintraege):
-    """US-04 und US-05: fragt alles ab, hängt den Eintrag an und speichert."""
+    """US-04 und US-05: fragt alles, hängt den Eintrag an, speichert."""
     eintrag = frage_eintrag(eintraege)
     arbeits_min = berechne_arbeitszeit_min(eintrag)
     print(f"Arbeitszeit: {wandle_minuten_in_text_um(arbeits_min)}")
