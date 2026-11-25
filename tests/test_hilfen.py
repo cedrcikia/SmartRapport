@@ -1,12 +1,16 @@
-# Automatische Tests für die Hilfsfunktionen (Prüfungen aus US-04, US-07,
-# Umwandlungen, Abgabetermin, Dateiname).
+# Automatische Tests für die Hilfsfunktionen (Prüfungen aus US-04 und
+# US-07, Umwandlungen, Abgabetermin, Dateiname).
 # Die Werte stammen aus den Akzeptanzkriterien im README.
 # Start im Hauptordner: python -m tests.test_hilfen
+import builtins
 from pathlib import Path
 
 from src.hilfen import (baue_rapport_dateiname, berechne_abgabetermin,
+                        behalte_eintraege_des_monats,
                         berechne_arbeitszeit_min,
-                        filtere_eintraege_nach_monat, hat_eintrag_fuer_datum,
+                        filtere_eintraege_nach_monat, frage_ja_nein,
+                        hat_eintrag_fuer_datum, lies_eingabe,
+                        sortiere_eintraege_nach_datum,
                         ist_dezimalzahl, ist_gueltige_uhrzeit,
                         ist_gueltiger_monat, ist_gueltiges_datum,
                         ist_nur_ziffern, lese_zeilen_aus_datei,
@@ -114,6 +118,47 @@ assert "?" in zeilen[1]
 # Schreiben in einen Pfad, der ein Ordner ist, gibt False statt Absturz
 assert not schreibe_zeilen_in_datei(NEUER_ORDNER, ["x"])
 
+DATEI.unlink()
+NEUER_ORDNER.rmdir()
+
+
+# Eingaben: Leerzeichen am Rand zählen nicht, j/n auch gross
+EINGABEN = []
+
+
+def fake_input(frage=""):
+    """Ersetzt input(): gibt die vorbereiteten Eingaben nacheinander."""
+    return EINGABEN.pop(0)
+
+
+builtins.input = fake_input
+
+EINGABEN.extend(["  6  "])
+assert lies_eingabe("Wahl: ") == "6"
+EINGABEN.extend([" J "])
+assert frage_ja_nein("Sicher?") is True
+EINGABEN.extend(["x", "", " N"])
+assert frage_ja_nein("Sicher?") is False
+assert EINGABEN == []
+
+# Einträge eines Monats behalten und nach Datum sortieren
+durcheinander = [
+    {"datum": "09.10.2026", "start": "08:00", "ende": "16:00",
+     "pause_min": 30},
+    {"datum": "05.10.2026", "start": "08:00", "ende": "16:00",
+     "pause_min": 30},
+    {"datum": "03.11.2026", "start": "08:00", "ende": "16:00",
+     "pause_min": 30},
+]
+nur_oktober = behalte_eintraege_des_monats(durcheinander, "10.2026")
+assert len(nur_oktober) == 2
+sortiert = sortiere_eintraege_nach_datum(nur_oktober)
+assert [e["datum"] for e in sortiert] == ["05.10.2026", "09.10.2026"]
+
+# Eine Datei mit BOM (z. B. von Notepad) verliert keine Zeile
+NEUER_ORDNER.mkdir()
+DATEI.write_bytes(b"\xef\xbb\xbf05.10.2026;07:30;17:00;45\n")
+assert lese_zeilen_aus_datei(DATEI) == ["05.10.2026;07:30;17:00;45\n"]
 DATEI.unlink()
 NEUER_ORDNER.rmdir()
 

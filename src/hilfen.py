@@ -1,5 +1,5 @@
 # hilfen.py · Person A · Hilfsfunktionen für das ganze Team
-# Prüfen, Umwandeln und Fragen, die mehrere Dateien brauchen.
+# Prüfen, Umwandeln, Dateien und Fragen, die mehrere Dateien brauchen.
 
 from pathlib import Path
 
@@ -19,10 +19,10 @@ def ist_nur_ziffern(text):
 
 
 def ist_dezimalzahl(text):
-    """True bei einer Zahl wie 32.50 oder 5 (Ziffern und höchstens ein Punkt).
-    Ein Komma (32,50) ist ungültig.
+    """True bei einer Zahl wie 32.50 oder 5 (Ziffern, höchstens ein
+    Punkt). Ein Komma (32,50) ist ungültig.
     """
-    return text.replace(".", "", 1).isdecimal()
+    return ist_nur_ziffern(text.replace(".", "", 1))
 
 
 def ist_gueltiges_datum(text):
@@ -42,7 +42,7 @@ def ist_gueltiges_datum(text):
 
 
 def ist_gueltige_uhrzeit(text):
-    """Prüft HH:MM von 00:00 bis 23:59 (7:30 und 24:00 sind ungültig)."""
+    """Prüft HH:MM von 00:00 bis 23:59 (7:30 ist ungültig)."""
     if len(text) != 5 or text[2] != ":":
         return False
     if not ist_nur_ziffern(text[0:2] + text[3:5]):
@@ -65,7 +65,7 @@ def ist_gueltiger_monat(text):
 # ---------- Datum, Zeit und Dauer umwandeln ----------
 
 def zaehle_tage_im_monat(monat_nummer, jahr):
-    """Wie viele Tage hat der Monat? Februar: 29 im Schaltjahr, sonst 28."""
+    """Tage des Monats. Februar: 29 im Schaltjahr, sonst 28."""
     if monat_nummer == 2:
         if jahr % 4 == 0 and (jahr % 100 != 0 or jahr % 400 == 0):
             return 29
@@ -90,7 +90,7 @@ def wandle_minuten_in_text_um(gesamt_min):
 
 
 def berechne_arbeitszeit_min(eintrag):
-    """Arbeitszeit in Minuten: Ende minus Start minus Pause (Festlegung 2)."""
+    """Arbeitszeit in Minuten: Ende minus Start minus Pause."""
     start = wandle_zeit_in_minuten_um(eintrag["start"])
     ende = wandle_zeit_in_minuten_um(eintrag["ende"])
     return ende - start - eintrag["pause_min"]
@@ -98,33 +98,39 @@ def berechne_arbeitszeit_min(eintrag):
 
 # ---------- Einträge ----------
 
-def filtere_eintraege_nach_monat(eintraege, monat):
-    """Gibt alle Einträge eines Monats zurück, nach Datum sortiert.
-    eintraege: Liste aller Einträge (Dictionaries), monat: z.B. "10.2026".
-    Wird von US-07, US-08, US-11 und US-12 gebraucht.
-    """
-    # Schritt 1: nur die Einträge des gewählten Monats behalten
+def behalte_eintraege_des_monats(eintraege, monat):
+    """Behält nur die Einträge, deren Datum im Monat liegt."""
     monats_eintraege = []
     for eintrag in eintraege:
         # Ab Position 3 steht der Monat: "05.10.2026" -> "10.2026"
         if eintrag["datum"][3:] == monat:
             monats_eintraege.append(eintrag)
+    return monats_eintraege
 
-    # Schritt 2: alle Daten sammeln und sortieren. Das klappt als Text,
-    # weil alle im selben Monat liegen und der Tag immer 2 Stellen hat
+
+def sortiere_eintraege_nach_datum(eintraege):
+    """Gibt die Einträge nach Datum sortiert zurück.
+    Das klappt als Text nur, wenn alle im selben Monat liegen, weil der
+    Tag immer 2 Stellen hat. Pro Datum gibt es nur einen Eintrag.
+    """
     datumsliste = []
-    for eintrag in monats_eintraege:
+    for eintrag in eintraege:
         datumsliste.append(eintrag["datum"])
-    datumsliste = sorted(datumsliste)
 
-    # Schritt 3: für jedes Datum den passenden Eintrag anhängen
-    # (pro Datum gibt es nur einen Eintrag)
     sortiert = []
-    for datum in datumsliste:
-        for eintrag in monats_eintraege:
+    for datum in sorted(datumsliste):
+        for eintrag in eintraege:
             if eintrag["datum"] == datum:
                 sortiert.append(eintrag)
     return sortiert
+
+
+def filtere_eintraege_nach_monat(eintraege, monat):
+    """Gibt alle Einträge eines Monats zurück, nach Datum sortiert.
+    Wird von US-07, US-08, US-11 und US-12 gebraucht.
+    """
+    monats_eintraege = behalte_eintraege_des_monats(eintraege, monat)
+    return sortiere_eintraege_nach_datum(monats_eintraege)
 
 
 def hat_eintrag_fuer_datum(eintraege, datum):
@@ -138,7 +144,7 @@ def hat_eintrag_fuer_datum(eintraege, datum):
 # ---------- Rapport: Termin und Dateiname ----------
 
 def berechne_abgabetermin(monat):
-    """Letzter Tag des Monats als Text: "10.2026" wird zu "31.10.2026"."""
+    """Letzter Tag des Monats: "10.2026" wird zu "31.10.2026"."""
     monat_nummer = int(monat[0:2])
     jahr = int(monat[3:7])
     letzter_tag = zaehle_tage_im_monat(monat_nummer, jahr)
@@ -146,12 +152,12 @@ def berechne_abgabetermin(monat):
 
 
 def baue_rapport_dateiname(monat):
-    """Dateiname des Rapports: "10.2026" wird zu "rapport_10_2026.txt"."""
+    """Dateiname des Rapports: "10.2026" wird "rapport_10_2026.txt"."""
     return "rapport_" + monat[0:2] + "_" + monat[3:7] + ".txt"
 
 
 def baue_rapport_pfad(monat, ordner=DATEN_ORDNER):
-    """Voller Pfad des Rapports im Ordner daten/ (oder in einem anderen)."""
+    """Voller Pfad des Rapports (normal im Ordner daten/)."""
     return ordner / baue_rapport_dateiname(monat)
 
 
@@ -159,18 +165,21 @@ def baue_rapport_pfad(monat, ordner=DATEN_ORDNER):
 
 def lese_zeilen_aus_datei(pfad):
     """Liest alle Zeilen einer Textdatei und gibt sie als Liste zurück.
-    Gibt None zurück, wenn es die Datei nicht gibt oder sie nicht gelesen
-    werden darf. Die App stürzt in beiden Fällen nicht ab.
+    Gibt None zurück, wenn es die Datei nicht gibt oder sie nicht
+    gelesen werden darf. Die App stürzt in beiden Fällen nicht ab.
     """
     try:
-        # errors="replace": ein kaputtes Zeichen wird zu einem Ersatzzeichen.
-        # Die Zeile ist dann ungültig und wird später übersprungen
-        with open(pfad, "r", encoding="utf-8", errors="replace") as datei:
+        # utf-8-sig: ein BOM am Dateianfang (z. B. von Notepad) wird
+        # entfernt. errors="replace": ein kaputtes Zeichen wird zu einem
+        # Ersatzzeichen, die Zeile ist dann ungültig und wird
+        # übersprungen
+        with open(pfad, "r", encoding="utf-8-sig",
+                  errors="replace") as datei:
             zeilen = []
             for zeile in datei:
-                # Ersatzzeichen durch ? ersetzen, damit sich die Zeile in
-                # jeder Konsole ausgeben lässt
-                zeilen.append(zeile.replace("\ufffd", "?"))
+                # Ersatzzeichen durch ? ersetzen, damit sich die Zeile
+                # in jeder Konsole ausgeben lässt
+                zeilen.append(zeile.replace("�", "?"))
             return zeilen
     except FileNotFoundError:
         return None
@@ -180,8 +189,8 @@ def lese_zeilen_aus_datei(pfad):
 
 
 def schreibe_zeilen_in_datei(pfad, zeilen):
-    """Schreibt die Zeilen in die Datei. Gibt True zurück, wenn es geklappt
-    hat, sonst False und eine Meldung.
+    """Schreibt die Zeilen in die Datei. Gibt True zurück, wenn es
+    geklappt hat, sonst False und eine Meldung.
     """
     try:
         # Ordner anlegen, falls es ihn nicht (mehr) gibt
@@ -198,19 +207,26 @@ def schreibe_zeilen_in_datei(pfad, zeilen):
 
 # ---------- Fragen ----------
 
+def lies_eingabe(frage):
+    """Fragt mit input() und entfernt Leerzeichen am Anfang und Ende."""
+    return input(frage).strip()
+
+
 def frage_ja_nein(frage):
-    """Fragt, bis "j" oder "n" eingegeben wird. Gibt True bei "j" zurück."""
-    eingabe = input(frage + " ")
+    """Fragt, bis "j" oder "n" eingegeben wird (auch J und N gelten).
+    Gibt True bei "j" zurück.
+    """
+    eingabe = lies_eingabe(frage + " ").lower()
     while eingabe != "j" and eingabe != "n":
         print("Bitte j oder n eingeben.")
-        eingabe = input(frage + " ")
+        eingabe = lies_eingabe(frage + " ").lower()
     return eingabe == "j"
 
 
 def frage_monat():
     """Fragt den Monat, bis er gültig ist, und gibt ihn zurück."""
-    eingabe = input("Monat (MM.JJJJ): ")
+    eingabe = lies_eingabe("Monat (MM.JJJJ): ")
     while not ist_gueltiger_monat(eingabe):
         print("Ungültiger Monat (MM.JJJJ).")
-        eingabe = input("Monat (MM.JJJJ): ")
+        eingabe = lies_eingabe("Monat (MM.JJJJ): ")
     return eingabe
