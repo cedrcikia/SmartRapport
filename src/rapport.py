@@ -2,44 +2,29 @@
 
 from src.berechnung import baue_uebersicht_zeilen, berechne_monat
 from src.hilfen import (baue_rapport_dateiname, baue_rapport_pfad,
-                        berechne_abgabetermin, berechne_arbeitszeit_min,
+                        berechne_abgabetermin,
                         filtere_eintraege_nach_monat, frage_ja_nein,
-                        frage_monat, schreibe_zeilen_in_datei,
-                        wandle_minuten_in_text_um)
+                        frage_monat, schreibe_zeilen_in_datei)
+from src.verwaltung import baue_eintragszeilen
 
-TRENNLINIE = "-" * 40
-
-
-def baue_eintragszeilen(monats_eintraege):
-    """Eine Zeile pro Eintrag (ab 1 nummeriert), am Schluss das Total."""
-    zeilen = []
-    nummer = 0
-    total_min = 0
-    for eintrag in monats_eintraege:
-        nummer += 1
-        arbeits_min = berechne_arbeitszeit_min(eintrag)
-        total_min += arbeits_min
-        zeilen.append(f"{nummer}. {eintrag['datum']}  {eintrag['start']}–"
-                      f"{eintrag['ende']}  Pause {eintrag['pause_min']} Min  "
-                      f"{wandle_minuten_in_text_um(arbeits_min)}")
-    zeilen.append(f"Total: {wandle_minuten_in_text_um(total_min)}")
-    return zeilen
+TRENNLINIE_LAENGE = 40
 
 
 def baue_rapport(monat, monats_eintraege, einstellungen):
     """Setzt alle Zeilen des Rapports zusammen, noch ohne Datei."""
     ergebnis = berechne_monat(monats_eintraege, einstellungen)
+    trennlinie = "-" * TRENNLINIE_LAENGE
     zeilen = [f"SMARTRAPPORT – RAPPORT {monat}",
               f"Abgabetermin: {berechne_abgabetermin(monat)}",
-              TRENNLINIE]
+              trennlinie]
     zeilen += baue_eintragszeilen(monats_eintraege)
-    zeilen.append(TRENNLINIE)
+    zeilen.append(trennlinie)
     zeilen += baue_uebersicht_zeilen(ergebnis, einstellungen)
     return zeilen
 
 
 def speichere_rapport(eintraege, einstellungen):
-    """US-12: Fragt den Monat ab und speichert den Rapport als Textdatei."""
+    """US-12: Fragt den Monat und speichert den Rapport."""
     monat = frage_monat()
     monats_eintraege = filtere_eintraege_nach_monat(eintraege, monat)
     # Ohne Einträge gibt es keinen Rapport
@@ -49,7 +34,8 @@ def speichere_rapport(eintraege, einstellungen):
     pfad = baue_rapport_pfad(monat)
     # Bestehende Datei nur nach Rückfrage überschreiben
     if pfad.exists():
-        if not frage_ja_nein("Datei existiert bereits. Überschreiben? (j/n)"):
+        if not frage_ja_nein("Datei existiert bereits. "
+                             "Überschreiben? (j/n)"):
             print("Rapport nicht gespeichert.")
             return
     zeilen = baue_rapport(monat, monats_eintraege, einstellungen)
