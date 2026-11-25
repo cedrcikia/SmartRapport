@@ -9,6 +9,7 @@ from src.einstellungen import (aendere_sollzeit, aendere_stundenlohn,
                                lade_einstellungen)
 from src.erfassung import trage_arbeitstag_ein
 from src.erinnerung import zeige_erinnerung
+from src.hilfen import lies_eingabe
 from src.pfade import lege_daten_ordner_an
 from src.rapport import speichere_rapport
 from src.speicher import lade_eintraege
@@ -30,47 +31,80 @@ def zeige_hauptmenue():
     print("9. Beenden")
 
 
-def starte_app():
-    """Startablauf laut Teamplan, dann Hauptmenü, bis der Benutzer 9 wählt."""
-    # Ordner für die Dateien anlegen, dann Einstellungen und Einträge
-    # einmal beim Start laden (Festlegung 7)
+def fuehre_eintragsfunktion_aus(wahl, eintraege, einstellungen):
+    """Führt Menüpunkt 1 bis 5 aus (Einträge, Übersicht, Rapport)."""
+    if wahl == "1":
+        trage_arbeitstag_ein(eintraege)
+    elif wahl == "2":
+        zeige_eintraege(eintraege)
+    elif wahl == "3":
+        aendere_oder_loesche_eintrag(eintraege)
+    elif wahl == "4":
+        zeige_uebersicht(eintraege, einstellungen)
+    else:
+        speichere_rapport(eintraege, einstellungen)
+
+
+def fuehre_einstellungsfunktion_aus(wahl, einstellungen):
+    """Führt Menüpunkt 6 bis 8 aus (Stundenlohn, Sollzeit, Sätze)."""
+    if wahl == "6":
+        aendere_stundenlohn(einstellungen)
+    elif wahl == "7":
+        aendere_sollzeit(einstellungen)
+    else:
+        aendere_zuschlag_und_abzuege(einstellungen)
+
+
+def fuehre_menuepunkt_aus(wahl, eintraege, einstellungen):
+    """Führt den gewählten Menüpunkt aus. Gibt False zurück bei 9
+    (Beenden), sonst True.
+    """
+    if wahl in ("1", "2", "3", "4", "5"):
+        fuehre_eintragsfunktion_aus(wahl, eintraege, einstellungen)
+    elif wahl in ("6", "7", "8"):
+        fuehre_einstellungsfunktion_aus(wahl, einstellungen)
+    elif wahl == "9":
+        # alles wurde schon beim Ändern gespeichert, darum nur Abschied
+        print("Auf Wiedersehen!")
+        return False
+    else:
+        # 0, 10, abc oder leer
+        print("Ungültige Wahl.")
+    return True
+
+
+def lade_startdaten():
+    """Legt den Ordner daten/ an, lädt Einstellungen und Einträge
+    (Festlegung 7) und erinnert an den Abgabetermin (US-09).
+    """
     lege_daten_ordner_an()
     einstellungen = lade_einstellungen()
     eintraege = lade_eintraege()
-
-    # US-09: beim Start an den Abgabetermin erinnern
     zeige_erinnerung(date.today())
+    return einstellungen, eintraege
 
-    # Endlosschleife, damit das Menü nach jeder Funktion wieder erscheint
-    while True:
-        zeige_hauptmenue()
 
-        # Vergleich als Text statt int(): so stürzt "abc" nicht ab
-        wahl = input("Deine Wahl: ")
+def starte_app():
+    """Startablauf laut Teamplan, dann Hauptmenü, bis der Benutzer 9
+    wählt.
+    """
+    einstellungen, eintraege = lade_startdaten()
 
-        if wahl == "1":
-            trage_arbeitstag_ein(eintraege)
-        elif wahl == "2":
-            zeige_eintraege(eintraege)
-        elif wahl == "3":
-            aendere_oder_loesche_eintrag(eintraege)
-        elif wahl == "4":
-            zeige_uebersicht(eintraege, einstellungen)
-        elif wahl == "5":
-            speichere_rapport(eintraege, einstellungen)
-        elif wahl == "6":
-            aendere_stundenlohn(einstellungen)
-        elif wahl == "7":
-            aendere_sollzeit(einstellungen)
-        elif wahl == "8":
-            aendere_zuschlag_und_abzuege(einstellungen)
-        elif wahl == "9":
-            # alles wurde schon beim Ändern gespeichert, darum nur Abschied
-            print("Auf Wiedersehen!")
-            break  # einziger Ausgang aus der Schleife
-        else:
-            # 0, 10, abc oder leer
-            print("Ungültige Wahl.")
+    # Das Menü erscheint nach jeder Funktion wieder. Strg+C und Strg+Z
+    # (Eingabe-Ende) beenden die App ohne Fehlermeldung. Gespeichert
+    # wird schon bei jeder Änderung, es geht nichts verloren.
+    weiter = True
+    try:
+        while weiter:
+            zeige_hauptmenue()
+            wahl = lies_eingabe("Deine Wahl: ")
+            weiter = fuehre_menuepunkt_aus(wahl, eintraege, einstellungen)
+    except KeyboardInterrupt:
+        print()
+        print("Programm beendet.")
+    except EOFError:
+        print()
+        print("Programm beendet.")
 
 
 # Startet das Menü nur, wenn main.py direkt ausgeführt wird

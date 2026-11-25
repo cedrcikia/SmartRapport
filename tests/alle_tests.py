@@ -4,6 +4,7 @@ import tests.test_berechnung
 import tests.test_einstellungen
 import tests.test_erinnerung
 import tests.test_hilfen
+import tests.test_menue
 import tests.test_rapport
 import tests.test_speicher
 
